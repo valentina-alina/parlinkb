@@ -13,8 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//? @@index([groupId], map: "student_groupId_fkey")
-
 model Categories {
   id        Int      @id @default(autoincrement())
   name      String   @db.VarChar(50)
