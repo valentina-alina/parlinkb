@@ -13,23 +13,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Categories {
+model Category {
   id        String    @id @default(cuid())
   name      String    @db.VarChar(50)
   createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-  Ads       Ads[]
+  updatedAt DateTime? @default(now()) @updatedAt
+  Ads       Ad[]
 }
 
-model Subjects {
+model Subject {
   id        String    @id @default(cuid())
   name      String    @db.VarChar(50)
   createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  updatedAt DateTime? @default(now()) @updatedAt
   UserHasSubjects UserHasSubjects[]
 }
 
-model Users {
+model User {
   id         String     @id @default(cuid())
   firstName  String     @db.VarChar(70)
   lastName   String     @db.VarChar(70)
@@ -38,19 +38,19 @@ model Users {
   status     UserStatus
   password   String     @db.VarChar(50)
   createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  Profiles   Profiles?
-  Ads        Ads[]
-  Files      Files[]
-  UserGroups UserGroups[]
-  Messages   Messages[]
-  UserHasAd  UserHasAd[]
-  UserHasChild UserHasChild[]
-  UserGroupHasUser UserGroupHasUser[]
+  updatedAt  DateTime   @default(now()) @updatedAt
+  Profiles   Profile?
+  Ads        Ad[]
+  Files      File[]
+  UserGroups UserGroup[]
+  Messages   Message[]
+  UserHasAd  UserHasAds[]
+  UserHasChild UserHasChildren[]
+  UserGroupHasUser UserGroupHasUsers[]
   UserHasSubjects UserHasSubjects[]
 }
 
-model Profiles {
+model Profile {
   id             String    @id @default(cuid())
   phone          String    @db.VarChar(255)
   city           String    @db.VarChar(255)
@@ -58,25 +58,25 @@ model Profiles {
   address        String    @db.VarChar(255)
   profilePicture String    @db.VarChar(50)
   createdAt      DateTime? @default(now())
-  updatedAt      DateTime? @updatedAt
+  updatedAt      DateTime? @default(now()) @updatedAt
   userId         String    @unique
-  Users          Users     @relation(fields: [userId], references: [id])
+  Users          User     @relation(fields: [userId], references: [id])
 
   @@unique([id, userId])
 }
 
-model Children {
+model Child {
   id         String    @id @default(cuid())
   firstName  String?   @db.VarChar(255)
   lastName   String?   @db.VarChar(50)
   school     String?   @db.VarChar(50)
   class      String?   @db.VarChar(50)
   createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @updatedAt
-  UserHasChild UserHasChild[]
+  updatedAt  DateTime? @default(now()) @updatedAt
+  UserHasChild UserHasChildren[]
 }
 
-model Ads {
+model Ad {
   id         String     @id @default(cuid())
   title      String     @db.VarChar(50)
   description String    @db.VarChar(500)
@@ -93,87 +93,87 @@ model Ads {
   status     AdStatus?
   adPicture  String?    @db.VarChar(50)
   createdAt  DateTime?  @default(now())
-  updatedAt  DateTime?  @updatedAt
+  updatedAt  DateTime?  @default(now()) @updatedAt
   userId     String
   categoryId String
-  Users      Users      @relation(fields: [userId], references: [id])
-  Categories Categories @relation(fields: [categoryId], references: [id])
+  Users      User      @relation(fields: [userId], references: [id])
+  Categories Category @relation(fields: [categoryId], references: [id])
   AdHasFile  AdHasFile[]
-  UserHasAd  UserHasAd[]
+  UserHasAd  UserHasAds[]
 
   @@index([userId], map: "user_id")
   @@index([categoryId], map: "category_id")
 }
 
-model Files {
+model File {
   id         String    @id @default(cuid())
   filePath   String    @db.VarChar(500)
   fileType   FileType
   createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  updatedAt  DateTime  @default(now()) @updatedAt
   userId     String
-  Users      Users     @relation(fields: [userId], references: [id])
+  Users      User     @relation(fields: [userId], references: [id])
   AdHasFile  AdHasFile[]
-  UserGroupHasFile UserGroupHasFile[]
+  UserGroupHasFile UserGroupHasFiles[]
 
   @@index([userId], map: "user_id")
 }
 
-model UserGroups {
+model UserGroup {
   id         String    @id @default(cuid())
   nom        String?   @db.VarChar(50)
   createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @updatedAt
+  updatedAt  DateTime? @default(now()) @updatedAt
   userId     String
-  Users      Users     @relation(fields: [userId], references: [id])
-  UserGroupHasUser UserGroupHasUser[]
-  UserGroupHasFile UserGroupHasFile[]
+  Users      User     @relation(fields: [userId], references: [id])
+  UserGroupHasUser UserGroupHasUsers[]
+  UserGroupHasFile UserGroupHasFiles[]
 
   @@index([userId], map: "user_id")
 }
 
-model Messages {
+model Message {
   id               String         @id @default(cuid())
   text             String         @db.VarChar(500)
   conform          Boolean?
   relatedEntityId  Int?
   relatedEntityType RelatedEntityType?
   userId           String
-  Users            Users          @relation(fields: [userId], references: [id])
+  Users            User          @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "user_id")
 }
 
-model UserHasAd {
+model UserHasAds {
   userId       String
   adId         String
   userAttendees Int?
   status       UserAdStatus?
   createdAt    DateTime? @default(now())
-  updatedAt    DateTime? @updatedAt
-  Users        Users     @relation(fields: [userId], references: [id])
-  Ads          Ads       @relation(fields: [adId], references: [id])
+  updatedAt    DateTime? @default(now()) @updatedAt
+  Users        User     @relation(fields: [userId], references: [id])
+  Ads          Ad       @relation(fields: [adId], references: [id])
 
   @@id([userId, adId])
   @@index([adId], map: "ad_id")
 }
 
-model UserHasChild {
+model UserHasChildren {
   userId       String
   childId      String
-  Users        Users     @relation(fields: [userId], references: [id])
-  Children     Children  @relation(fields: [childId], references: [id])
+  Users        User     @relation(fields: [userId], references: [id])
+  Children     Child  @relation(fields: [childId], references: [id])
 
   @@id([userId, childId])
   @@index([childId], map: "child_id")
 }
 
-model UserGroupHasUser {
+model UserGroupHasUsers {
   userId       String
   userGroupId  String
   status       UserGroupUserStatus?
-  Users        Users        @relation(fields: [userId], references: [id])
-  UserGroups   UserGroups   @relation(fields: [userGroupId], references: [id])
+  Users        User        @relation(fields: [userId], references: [id])
+  UserGroups   UserGroup   @relation(fields: [userGroupId], references: [id])
 
   @@id([userId, userGroupId])
   @@index([userGroupId], map: "user_group_id")
@@ -182,8 +182,8 @@ model UserGroupHasUser {
 model AdHasFile {
   adId       String
   fileId     String
-  Ads        Ads       @relation(fields: [adId], references: [id])
-  Files      Files     @relation(fields: [fileId], references: [id])
+  Ads        Ad       @relation(fields: [adId], references: [id])
+  Files      File     @relation(fields: [fileId], references: [id])
 
   @@id([adId, fileId])
   @@index([fileId], map: "file_id")
@@ -192,19 +192,19 @@ model AdHasFile {
 model UserHasSubjects {
   userId     String
   subjectId  String
-  Users      Users     @relation(fields: [userId], references: [id])
-  Subjects   Subjects  @relation(fields: [subjectId], references: [id])
+  Users      User     @relation(fields: [userId], references: [id])
+  Subjects   Subject  @relation(fields: [subjectId], references: [id])
 
   @@id([userId, subjectId])
   @@index([subjectId], map: "fk_Users_has_Subjects_Subjects1_idx")
   @@index([userId], map: "fk_Users_has_Subjects_Users1_idx")
 }
 
-model UserGroupHasFile {
+model UserGroupHasFiles {
   fileId      String
   userGroupId String
-  Files       Files       @relation(fields: [fileId], references: [id])
-  UserGroups  UserGroups  @relation(fields: [userGroupId], references: [id])
+  Files       File       @relation(fields: [fileId], references: [id])
+  UserGroups  UserGroup  @relation(fields: [userGroupId], references: [id])
 
   @@id([fileId, userGroupId])
   @@index([userGroupId], map: "fk_Files_has_User_groups_User_groups1_idx")
