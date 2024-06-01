@@ -1,27 +1,49 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Prisma, User } from '@prisma/client';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+
+  private users : User[] = [];
+  constructor(private prisma: PrismaService) {}
+
+  async create(data: CreateUserDto): Promise<User> {
+    return this.prisma.user.create({
+        data,
+    })
+}
+
+  async findByUnique(
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput
+  ): Promise<User | null> {
+    return this.prisma.user.findUnique({
+        where: userWhereUniqueInput,
+    });
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll(skip?: number, take?: number): Promise<User[]>{
+    return this.prisma.user.findMany({
+        skip,
+        take,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async update(
+    where: Prisma.UserWhereUniqueInput,
+    data: Prisma.UserUpdateInput
+  ): Promise<User> {
+      return this.prisma.user.update({
+          where,
+          data,
+      });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  async delete(where: Prisma.UserWhereUniqueInput): Promise<User> {
+      return this.prisma.user.delete({
+          where,
+      })
+  };
 }

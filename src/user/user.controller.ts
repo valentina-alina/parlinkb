@@ -1,35 +1,88 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from '@prisma/client';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @Get()
+  async findAll(@Query() query: {skip?: string, take?: string}): Promise<User[]> {
+    return this.userService.findAll(+query.skip, +query.take);
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  @Post()
+    async create(
+      @Param('id') id: string,
+      @Body() data: CreateUserDto): Promise<User | { error: boolean, message: string }> {
+        const user = await this.userService.findByUnique({
+          email: data.email,
+          id: ''
+        });
+
+        if(user) {
+            return { error: true, message: "l'utilisateur existe déjà" + user.email};
+        }
+        return this.userService.create(data);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  async readRoute(
+      @Param('id') id: string,
+  ): Promise<User | { error: boolean, message: string }> {
+  
+      const user = await this.userService.findByUnique({ id });
+
+      if (!user) {
+          return { error: true, message: "pas d'utilisateur à cet id" + id};
+      }
+
+      return user;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Put(':id')
+  async updateRoute(
+      @Param('id') id: string,
+      @Body() userUpdateDto: UpdateUserDto,
+  ): Promise<User | { error?: boolean, message: string }> {
+      const user = this.userService.findByUnique({ id });
+      
+      if(!user) {
+          return { error: true, message: `Pas d\'utilisateur trouvé avec cet id ${id}` }
+      }
+
+      const user_email = await this.userService.findByUnique({
+        email: userUpdateDto.email,
+        id: ''
+      });
+
+      if(!user_email) {
+          return { error: true, message: `Pas d\'utilisateur trouvé avec cet email ${user_email} ` }
+      }
+      const userUpdate = await this.userService.update({ id }, userUpdateDto);
+
+      return { message: `Utilisateur avec id ${id} à jour`, ...userUpdate}
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
+    async deleteRoute(@Param('id') id: string,): Promise<User | { error?: boolean, message: string }> {
+        const user = await this.userService.findByUnique({ id })
+        if(!user) {
+            return { error: true, message: 'L\'utilisateur n\'a pas été trouvé'}
+        }
+        this.userService.delete({id });
+        return { message: `L'utilisateur avec l'id ${ id } a bien été supprimé` }
+    }
 }
