@@ -39,7 +39,7 @@ model User {
   password   String     @db.VarChar(50)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now()) @updatedAt
-  Profile   Profile?
+  Profile    Profile?
   ads        Ad[]
   files      File[]
   userGroups UserGroup[]
@@ -138,6 +138,8 @@ model Message {
   conform          Boolean?
   relatedEntityId  Int?
   relatedEntityType RelatedEntityType?
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @default(now()) @updatedAt
   userId           String
   user            User          @relation(fields: [userId], references: [id])
 
