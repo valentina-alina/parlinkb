@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { IsNotEmpty, IsStrongPassword, IsString, MinLength, MaxLength, Matches, IsAlpha } from 'class-validator';
+import { IsNotEmpty, IsString, MinLength, MaxLength, IsAlpha } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginUserDto {
@@ -14,8 +14,6 @@ export class LoginUserDto {
 
     @IsNotEmpty()
     @IsString()
-    @IsStrongPassword()
-    @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {message: 'password too weak'})
     @ApiProperty({ required: true })
     password: string;
 }

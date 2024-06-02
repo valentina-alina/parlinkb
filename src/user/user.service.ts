@@ -8,14 +8,30 @@ import { PrismaService } from 'prisma/prisma.service';
 export class UserService {
 
   private users : User[] = [];
-  findByFirstName: any;
+  
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateUserDto): Promise<User> {
     return this.prisma.user.create({
         data,
     })
-}
+  }
+
+  async findByFirstName(firstName: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
+        where: {
+            firstName: firstName
+        },
+    });
+  }
+
+  async findByPassword(password: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
+        where: {
+            password: password
+        },
+    });
+  }
 
   async findByUnique(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput

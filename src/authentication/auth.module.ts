@@ -9,6 +9,10 @@ import { UserModule } from 'src/user/user.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 
+const hours = 6;
+const secondsInHour = 3600;
+const expiresIn = hours * secondsInHour;
+
 @Module({
     imports: [
         PrismaModule,
@@ -17,7 +21,7 @@ import { JwtModule } from '@nestjs/jwt';
         JwtModule.register({
             secret: process.env.JWT_SECRET,
             signOptions: {
-                expiresIn: process.env.EXPIRES_IN
+                expiresIn: expiresIn,
             }
         })
     ],
