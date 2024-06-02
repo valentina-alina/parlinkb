@@ -11,9 +11,21 @@ import { CategoryModule } from './category/category.module';
 import { SubjectModule } from './subject/subject.module';
 import { UserGroupModule } from './user-group/user-group.module';
 import { MessageModule } from './message/message.module';
+import { AuthModule } from './authentication/auth.module';
 
 @Module({
-  imports: [UserModule, ProfileModule, ChildModule, AdModule, FileModule, CategoryModule, SubjectModule, UserGroupModule, MessageModule],
+  imports: [
+    UserModule,
+    AuthModule,
+    ProfileModule,
+    ChildModule,
+    AdModule,
+    FileModule,
+    CategoryModule,
+    SubjectModule,
+    UserGroupModule,
+    MessageModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
