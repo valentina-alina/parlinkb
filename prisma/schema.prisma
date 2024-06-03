@@ -19,6 +19,19 @@ model Category {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now()) @updatedAt
   ads       Ad[]
+  subCategory SubCategory[]
+}
+
+model SubCategory {
+  id        String    @id @default(cuid())
+  name      String    @db.VarChar(50)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now()) @updatedAt
+  ads       Ad[]
+  categoryId String
+  category  Category  @relation(fields: [categoryId], references: [id])
+
+  @@unique([id, categoryId])
 }
 
 model Subject {
@@ -96,13 +109,16 @@ model Ad {
   updatedAt  DateTime?  @default(now()) @updatedAt
   userId     String
   categoryId String
-  users      User      @relation(fields: [userId], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
+  subCategoryId String  @default("test")
+  users      User       @relation(fields: [userId], references: [id])
+  category   Category   @relation(fields: [categoryId], references: [id])
+  subCategory SubCategory @relation(fields: [subCategoryId], references: [id])
   adHasFile  AdHasFile[]
   userHasAd  UserHasAds[]
 
   @@index([userId], map: "user_id")
   @@index([categoryId], map: "category_id")
+  @@index([subCategoryId], map: "subCategory_id")
 }
 
 model File {

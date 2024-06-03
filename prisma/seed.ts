@@ -62,7 +62,21 @@ const generateCategories = (count: number) => {
     return categories;
 };
 
-const generateAds = async (userId: string, categoryIds: string[], count: number) => {
+const generateSubCategories = (categoryIds: string[], count: number) => {
+    const subCategories = [];
+    for (let i = 0; i < count; i++) {
+        subCategories.push({
+            id: faker.string.uuid(),
+            name: faker.commerce.department(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            categoryId: categoryIds[i % categoryIds.length],
+        });
+    }
+    return subCategories;
+};
+
+const generateAds = async (userId: string, categoryIds: string[], subCategoryIds: string[], count: number) => {
     const ads = [];
     for (let i = 0; i < count; i++) {
         const adId = faker.string.uuid();
@@ -88,6 +102,7 @@ const generateAds = async (userId: string, categoryIds: string[], count: number)
                     updatedAt: new Date(),
                     userId,
                     categoryId: faker.helpers.arrayElement(categoryIds),
+                    subCategoryId: faker.helpers.arrayElement(subCategoryIds),
                 },
             });
             ads.push(createdAd);
@@ -208,6 +223,15 @@ const seed = async () => {
     const createdCategories = await Promise.all(categories.map(category => prisma.category.create({ data: category })));
     const categoryIds = createdCategories.map(category => category.id);
 
+    // Ensure unique categoryIds for subcategories
+    const subCategories = generateSubCategories(categoryIds, 5);
+    const subCategoryData = subCategories.map(subCategory => ({
+        ...subCategory,
+        categoryId: categoryIds[subCategories.indexOf(subCategory) % categoryIds.length]
+    }));
+    const createdSubCategories = await Promise.all(subCategoryData.map(subCategory => prisma.subCategory.create({ data: subCategory })));
+    const subCategoryIds = createdSubCategories.map(subCategory => subCategory.id);
+    
     const subjects = generateSubjects(5);
     const createdSubjects = await Promise.all(subjects.map(subject => prisma.subject.create({ data: subject })));
 
@@ -221,7 +245,7 @@ const seed = async () => {
         const profile = generateProfiles(createdUser.id);
         await prisma.profile.create({ data: profile });
 
-        const ads = await generateAds(createdUser.id, categoryIds, 3);
+        const ads = await generateAds(createdUser.id, categoryIds, subCategoryIds, 3);
         const adIds = ads.map(ad => ad.id);
 
         for (const ad of ads) {
@@ -253,11 +277,11 @@ const seed = async () => {
         
         try {
             for (const relation of userHasChildren) {
-            await prisma.userHasChildren.upsert({
-                where: { userId_childId: { userId: relation.userId, childId: relation.childId } },
-                update: {},
-                create: relation,
-            });
+                await prisma.userHasChildren.upsert({
+                    where: { userId_childId: { userId: relation.userId, childId: relation.childId } },
+                    update: {},
+                    create: relation,
+                });
             }
         } catch (error) {
             console.error('Erreur à la création:', error);
