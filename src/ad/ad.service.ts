@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 
+//TODO:
 @Injectable()
 export class AdService {
   create(createAdDto: CreateAdDto) {

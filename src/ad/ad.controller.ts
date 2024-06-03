@@ -4,6 +4,7 @@ import { AdService } from './ad.service';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 
+//TODO:
 @Controller('ad')
 export class AdController {
   constructor(private readonly adService: AdService) {}
