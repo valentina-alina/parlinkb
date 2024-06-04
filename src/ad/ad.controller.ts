@@ -4,7 +4,10 @@ import { AdService } from './ad.service';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 
-//TODO:
+//TODO: ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
+//TODO: ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
+//TODO: ROUTE PAGINATION??
+//TODO: ROUTE AFFICHER ANNONCE PAR UTILISATEUR [OU DANS USER.CONTROLLER??]
 @Controller('ad')
 export class AdController {
   constructor(private readonly adService: AdService) {}
