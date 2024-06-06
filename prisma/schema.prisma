@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Category {
-  id        String    @id @default(cuid())
+  id        String    @id @default(cuid()) @db.VarChar(191)
   name      String    @db.VarChar(50)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now()) @updatedAt
@@ -23,19 +23,19 @@ model Category {
 }
 
 model SubCategory {
-  id        String    @id @default(cuid())
+  id        String    @id @default(cuid()) @db.VarChar(191)
   name      String    @db.VarChar(50)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now()) @updatedAt
   ads       Ad[]
-  categoryId String
+  categoryId String   @db.VarChar(191)
   category  Category  @relation(fields: [categoryId], references: [id])
 
-  @@unique([id, categoryId])
+  @@unique([id, categoryId(191)])
 }
 
 model Subject {
-  id        String    @id @default(cuid())
+  id        String    @id @default(cuid()) @db.VarChar(191)
   name      String    @db.VarChar(50)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now()) @updatedAt
@@ -45,14 +45,14 @@ model Subject {
 
 //FIXME: AJOUTER PROFILE ID DANS TABLE USER ET ENLEVER USERID DE TABLE PROFILE
 model User {
-  id         String     @id @default(cuid())
+  id         String     @id @default(cuid()) @db.VarChar(191)
   firstName  String     @db.VarChar(70)
   lastName   String     @db.VarChar(70)
-  email      String     @db.VarChar(70)
+  email      String     @db.VarChar(70) @unique
   role       UserRole   @default(admin)
   status     UserStatus @default(activated)
-  password   String     @db.VarChar(50)
-  refreshToken String?
+  password   String     @db.VarChar(100)
+  refreshToken String?  @db.VarChar(100)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now()) @updatedAt
   Profile    Profile?
@@ -67,7 +67,7 @@ model User {
 }
 
 model Profile {
-  id             String    @id @default(cuid())
+  id             String    @id @default(cuid()) @db.VarChar(191)
   phone          String    @db.VarChar(50)
   city           String    @db.VarChar(50)
   postalCode     String    @db.VarChar(50)
@@ -75,14 +75,14 @@ model Profile {
   profilePicture String    @db.VarChar(50)
   createdAt      DateTime? @default(now())
   updatedAt      DateTime? @default(now()) @updatedAt
-  userId         String    @unique
+  userId         String    @unique @db.VarChar(191)
   user          User     @relation(fields: [userId], references: [id])
 
-  @@unique([id, userId])
+  @@unique([id, userId(191)])
 }
 
 model Child {
-  id         String    @id @default(cuid())
+  id         String    @id @default(cuid()) @db.VarChar(191)
   firstName  String?   @db.VarChar(255)
   lastName   String?   @db.VarChar(50)
   school     String?   @db.VarChar(50)
@@ -93,7 +93,7 @@ model Child {
 }
 
 model Ad {
-  id         String     @id @default(cuid())
+  id         String     @id @default(cuid()) @db.VarChar(191)
   title      String     @db.VarChar(50)
   description String    @db.VarChar(500)
   startTime  DateTime?  @db.DateTime
@@ -110,126 +110,126 @@ model Ad {
   adPicture  String?    @db.VarChar(50)
   createdAt  DateTime?  @default(now())
   updatedAt  DateTime?  @default(now()) @updatedAt
-  userId     String
-  categoryId String
-  subCategoryId String  @default("test")
+  userId     String     @db.VarChar(191)
+  categoryId String     @db.VarChar(191)
+  subCategoryId String  @db.VarChar(191) @default("test")
   users      User       @relation(fields: [userId], references: [id])
   category   Category   @relation(fields: [categoryId], references: [id])
   subCategory SubCategory @relation(fields: [subCategoryId], references: [id])
   adHasFile  AdHasFile[]
   userHasAd  UserHasAds[]
 
-  @@index([userId], map: "user_id")
-  @@index([categoryId], map: "category_id")
-  @@index([subCategoryId], map: "subCategory_id")
+  @@index([userId(191)], map: "user_id")
+  @@index([categoryId(191)], map: "category_id")
+  @@index([subCategoryId(191)], map: "subCategory_id")
 }
 
 model File {
-  id         String    @id @default(cuid())
+  id         String    @id @default(cuid()) @db.VarChar(191)
   filePath   String    @db.VarChar(500)
   fileType   FileType
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @default(now()) @updatedAt
-  userId     String
-  users      User     @relation(fields: [userId], references: [id])
+  userId     String    @db.VarChar(191)
+  users      User      @relation(fields: [userId], references: [id])
   adHasFile  AdHasFile[]
   userGroupHasFile UserGroupHasFiles[]
 
-  @@index([userId], map: "user_id")
+  @@index([userId(191)], map: "user_id")
 }
 
 model UserGroup {
-  id         String    @id @default(cuid())
+  id         String    @id @default(cuid()) @db.VarChar(191)
   nom        String?   @db.VarChar(50)
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now()) @updatedAt
-  userId     String
-  user      User     @relation(fields: [userId], references: [id])
+  userId     String    @db.VarChar(191)
+  user      User       @relation(fields: [userId], references: [id])
   userGroupHasUser UserGroupHasUsers[]
   userGroupHasFile UserGroupHasFiles[]
 
-  @@index([userId], map: "user_id")
+  @@index([userId(191)], map: "user_id")
 }
 
 model Message {
-  id               String         @id @default(cuid())
-  text             String         @db.VarChar(500)
+  id               String       @id @default(cuid()) @db.VarChar(191)
+  text             String       @db.VarChar(500)
   conform          Boolean?
   relatedEntityId  Int?
   relatedEntityType RelatedEntityType?
-  createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @default(now()) @updatedAt
-  userId           String
+  createdAt  DateTime?          @default(now())
+  updatedAt  DateTime?          @default(now()) @updatedAt
+  userId           String       @db.VarChar(191)
   user            User          @relation(fields: [userId], references: [id])
 
-  @@index([userId], map: "user_id")
+  @@index([userId(191)], map: "user_id")
 }
 
 model UserHasAds {
-  userId       String
-  adId         String
+  userId       String     @db.VarChar(191)
+  adId         String     @db.VarChar(191)
   userAttendees Int?
   status       UserAdStatus?
   createdAt    DateTime? @default(now())
   updatedAt    DateTime? @default(now()) @updatedAt
-  user        User     @relation(fields: [userId], references: [id])
-  ads          Ad       @relation(fields: [adId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+  ads          Ad        @relation(fields: [adId], references: [id])
 
-  @@id([userId, adId])
-  @@index([adId], map: "ad_id")
+  @@id([userId(191), adId(191)])
+  @@index([adId(191)], map: "ad_id")
 }
 
 model UserHasChildren {
-  userId       String
-  childId      String
-  user        User     @relation(fields: [userId], references: [id])
-  children     Child  @relation(fields: [childId], references: [id])
+  userId       String    @db.VarChar(191)
+  childId      String    @db.VarChar(191)
+  user        User       @relation(fields: [userId], references: [id])
+  children     Child     @relation(fields: [childId], references: [id])
 
-  @@id([userId, childId])
-  @@index([childId], map: "child_id")
+  @@id([userId(191), childId(191)])
+  @@index([childId(191)], map: "child_id")
 }
 
 model UserGroupHasUsers {
-  userId       String
-  userGroupId  String
+  userId       String    @db.VarChar(191)
+  userGroupId  String    @db.VarChar(191)
   status       UserGroupUserStatus?
-  users        User        @relation(fields: [userId], references: [id])
-  userGroup   UserGroup   @relation(fields: [userGroupId], references: [id])
+  users        User      @relation(fields: [userId], references: [id])
+  userGroup   UserGroup  @relation(fields: [userGroupId], references: [id])
 
-  @@id([userId, userGroupId])
-  @@index([userGroupId], map: "user_group_id")
+  @@id([userId(191), userGroupId(191)])
+  @@index([userGroupId(191)], map: "user_group_id")
 }
 
 model AdHasFile {
-  adId       String
-  fileId     String
+  adId       String  @db.VarChar(191)
+  fileId     String  @db.VarChar(191)
   ad        Ad       @relation(fields: [adId], references: [id])
   file      File     @relation(fields: [fileId], references: [id])
 
-  @@id([adId, fileId])
-  @@index([fileId], map: "file_id")
+  @@id([adId(191), fileId(191)])
+  @@index([fileId(191)], map: "file_id")
 }
 
 model UserHasSubjects {
-  userId     String
-  subjectId  String
+  userId     String  @db.VarChar(191)
+  subjectId  String  @db.VarChar(191)
   user      User     @relation(fields: [userId], references: [id])
-  subjects   Subject  @relation(fields: [subjectId], references: [id])
+  subjects   Subject @relation(fields: [subjectId], references: [id])
 
-  @@id([userId, subjectId])
-  @@index([subjectId], map: "fk_Users_has_Subjects_Subjects1_idx")
-  @@index([userId], map: "fk_Users_has_Subjects_Users1_idx")
+  @@id([userId(191), subjectId(191)])
+  @@index([subjectId(191)], map: "fk_Users_has_Subjects_Subjects1_idx")
+  @@index([userId(191)], map: "fk_Users_has_Subjects_Users1_idx")
 }
 
 model UserGroupHasFiles {
-  fileId      String
-  userGroupId String
-  files       File       @relation(fields: [fileId], references: [id])
+  fileId      String    @db.VarChar(191)
+  userGroupId String    @db.VarChar(191)
+  files       File      @relation(fields: [fileId], references: [id])
   userGroup  UserGroup  @relation(fields: [userGroupId], references: [id])
 
-  @@id([fileId, userGroupId])
-  @@index([userGroupId], map: "fk_Files_has_User_groups_User_groups1_idx")
-  @@index([fileId], map: "fk_Files_has_User_groups_Files1_idx")
+  @@id([fileId(191), userGroupId(191)])
+  @@index([userGroupId(191)], map: "fk_Files_has_User_groups_User_groups1_idx")
+  @@index([fileId(191)], map: "fk_Files_has_User_groups_Files1_idx")
 }
 
 enum UserRole {
