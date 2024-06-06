@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -13,6 +14,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '@prisma/client';
+import { CustomException } from '../exceptions/custom.exception';
 
 ////////////////////////////////!
 
@@ -84,15 +86,22 @@ export class UserController {
   @Post()
     async create(
       @Param('id') id: string,
-      @Body() data: CreateUserDto): Promise<User | { error: boolean, message: string }> {
+      @Body() data: CreateUserDto): Promise<any> {
         const user = await this.userService.findByUnique({email: data.email,
           id: ''
         });
 
         if(user) {
-            return { error: true, message: "l'utilisateur existe déjà" + user.email};
+          throw new CustomException('L\'utilisateur existe déjà', HttpStatus.CONFLICT, "UC-create-1")
         }
-        return this.userService.create(data);
+        const new_user =  await this.userService.create(data);
+        delete new_user.password
+
+        return {
+            user: new_user,
+            date: new Date(),
+            message: 'Utilisateur créé'
+        }
   }
 
   @Get(':id')

@@ -55,7 +55,7 @@ export class AuthController {
         return bcrypt.hash(data, 10);
     }
 
-    @Post('signup')
+    @Post('register')
     async signup(
         @Body() data: { firstName: string, lastName: string, email: string, password: string}
     ): Promise<any> {
@@ -89,12 +89,12 @@ export class AuthController {
         })
         
         if(!user) {
-            return new HttpException('Les identifiants ne correspondent pas', 401)
+            throw new HttpException('Les identifiants ne correspondent pas', 401)
         }
 
         const isValid = await bcrypt.compare(data.password, user.password)
         if (!isValid) {
-            return new HttpException('Les identifiants ne correspondent pas', 401)
+            throw new HttpException('Les identifiants ne correspondent pas', 401)
         }
 
         const payload = { sub: user.id, email: user.email}
