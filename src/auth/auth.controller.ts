@@ -10,11 +10,11 @@ import {
     UseGuards
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { AuthRefreshGuard } from 'src/guards/refresh.jwt.guards';
+import { AuthRefreshGuard } from '../../src/guards/refresh.jwt.guards';
 
 //TODO: CREATE USER + CREATE PROFILE --> SIGNUP | REGISTER
 //TODO: DELETE USER + DELETE PROFILE --> DELETE | REMOVE
