@@ -85,8 +85,7 @@ export class UserController {
     async create(
       @Param('id') id: string,
       @Body() data: CreateUserDto): Promise<User | { error: boolean, message: string }> {
-        const user = await this.userService.findByUnique({
-          email: data.email,
+        const user = await this.userService.findByUnique({email: data.email,
           id: ''
         });
 
@@ -101,13 +100,13 @@ export class UserController {
       @Param('id') id: string,
   ): Promise<User | { error: boolean, message: string }> {
   
-      const user = await this.userService.findByUnique({ id });
+    const user = await this.userService.findByUnique({ id });
 
-      if (!user) {
-          return { error: true, message: "pas d'utilisateur à cet id" + id};
-      }
+    if (!user) {
+      return { error: true, message: "Pas d'utilisateur à  l'id" + id};
+    }
 
-      return user;
+    return user;
   }
 
   @Put(':id')
@@ -131,7 +130,7 @@ export class UserController {
       }
       const userUpdate = await this.userService.update({ id }, userUpdateDto);
 
-      return { message: `Utilisateur avec id ${id} à jour`, ...userUpdate}
+      return { message: `Utilisateur avec l'id ${id} a bien été mis à jour`, ...userUpdate}
   }
 
   @Delete(':id')

@@ -37,14 +37,27 @@ export class UserService {
     userWhereUniqueInput: Prisma.UserWhereUniqueInput
   ): Promise<User | null> {
     return this.prisma.user.findUnique({
-        where: userWhereUniqueInput,
+        where: userWhereUniqueInput
     });
   }
 
-  async findAll(skip?: number, take?: number): Promise<User[]>{
+  async findByRefreshToken(
+    refreshToken: string
+  ): Promise<User> {
+    return this.prisma.user.findFirst(
+      {where:
+        {
+          refreshToken
+        }
+      }
+    );
+  }
+
+  async findAll(skip?: number, take?: number, where?: any): Promise<User[]>{
     return this.prisma.user.findMany({
         skip,
         take,
+        where,
     });
   }
 
@@ -52,15 +65,15 @@ export class UserService {
     where: Prisma.UserWhereUniqueInput,
     data: Prisma.UserUpdateInput
   ): Promise<User> {
-      return this.prisma.user.update({
-          where,
-          data,
-      });
+    return this.prisma.user.update({
+        where,
+        data,
+    });
   }
 
   async delete(where: Prisma.UserWhereUniqueInput): Promise<User> {
-      return this.prisma.user.delete({
-          where,
-      })
+    return this.prisma.user.delete({
+        where,
+    })
   };
 }

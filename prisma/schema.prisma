@@ -52,6 +52,7 @@ model User {
   role       UserRole   @default(admin)
   status     UserStatus @default(activated)
   password   String     @db.VarChar(50)
+  refreshToken String?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now()) @updatedAt
   Profile    Profile?
