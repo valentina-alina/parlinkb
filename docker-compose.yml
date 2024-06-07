@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    platform: linux/amd64
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: pass_wordvv
+      MYSQL_ROOT_PASSWORD: pass_wordvv
+      MYSQL_DATABASE: back
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: pass_wordvv
+      MYSQL_ROOT_PASSWORD: pass_wordvv
+      MYSQL_DATABASE: back
+    ports:
+      - "8080:80"
+    depends_on:
+      - mariadb
+
+volumes:
+  mariadb_data:
+    driver: local

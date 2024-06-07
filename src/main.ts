@@ -8,13 +8,6 @@ import { CustomHttpExceptionFilter } from './filters/custom-exception.filters';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  /* const cors = {
-    origin: ['http://localhost:3000'],
-    methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS'
-  }
-
-  app.enableCors(cors); */
   
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter(), new CustomHttpExceptionFilter());
