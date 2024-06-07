@@ -84,17 +84,16 @@ export class AuthController {
         @Body() data: { email: string, password: string}
     ): Promise<any> {
         const user = await this.userService.findByUnique({
-            email: data.email,
-            id: ""
+            email: data.email
         })
         
         if(!user) {
-            throw new HttpException('Les identifiants ne correspondent pas', 401)
+            throw new HttpException('Les identifiants ne correspondent pas - test1', 401)
         }
 
         const isValid = await bcrypt.compare(data.password, user.password)
         if (!isValid) {
-            throw new HttpException('Les identifiants ne correspondent pas', 401)
+            throw new HttpException('Les identifiants ne correspondent pas - test2', 401)
         }
 
         const payload = { sub: user.id, email: user.email}
