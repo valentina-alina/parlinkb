@@ -1,15 +1,11 @@
-version: "3.8"
-
 services:
   mariadb:
     image: mariadb:latest
     container_name: mariadb
     platform: linux/amd64
     environment:
-      MYSQL_USER: root
-      MYSQL_PASSWORD: pass_wordvv
-      MYSQL_ROOT_PASSWORD: pass_wordvv
       MYSQL_DATABASE: back
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
@@ -20,12 +16,31 @@ services:
     container_name: phpmyadmin
     environment:
       PMA_HOST: mariadb
-      MYSQL_USER: root
-      MYSQL_PASSWORD: pass_wordvv
-      MYSQL_ROOT_PASSWORD: pass_wordvv
-      MYSQL_DATABASE: back
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "8080:80"
+    depends_on:
+      - mariadb
+
+  mysql-client:
+    image: mysql:latest
+    container_name: mysql-client
+    command: tail -f /dev/null
+    depends_on:
+      - mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+  nestjs:
+    build: .
+    image: nestjs:v1
+    container_name: nestjs
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
     depends_on:
       - mariadb
 

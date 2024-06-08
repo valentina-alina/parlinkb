@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { PrismaClient, UserRole, UserStatus, Transport, AdStatus, FileType, UserAdStatus } from '@prisma/client';
+import { PrismaClient, UserStatus, Transport, AdStatus, FileType, UserAdStatus, UserRole } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();

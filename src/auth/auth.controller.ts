@@ -11,7 +11,7 @@ import {
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { UserService } from '../user/user.service';
-import { Request } from 'express';
+import { Request as ExpressRequest } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AuthRefreshGuard } from '../../src/guards/refresh.jwt.guards';
@@ -41,6 +41,11 @@ import { AuthRefreshGuard } from '../../src/guards/refresh.jwt.guards';
 //TODO: //FIXME: READ SUBJECT BY ID [FINDBYID] ??
 //TODO: //FIXME: UPDATE SUBJECTS ??
 //TODO: //FIXME: DELETE SUBJECTS ??
+
+interface Request extends ExpressRequest {
+    user?: { sub: number, email: string};
+    refreshToken: string;
+}
 
 @Controller('auth')
 export class AuthController {
