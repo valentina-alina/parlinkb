@@ -4,7 +4,12 @@ import { FileService } from './file.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 
-//TODO:
+//TODO: USER CREATE FILE
+//TODO: USER READ ALL FILES
+//TODO: USER READ FILES BY PARAMS --> UPDATE | DELETE [FINDBYPARAMS]
+//TODO: USER READ FILES BY ID --> UPDATE | DELETE [FINDBYUNIQUE]
+//TODO: USER DELETE FILES
+
 @Controller('file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}

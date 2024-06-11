@@ -4,7 +4,13 @@ import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 
-//TODO:
+//TODO: USER CREATE MESSAGE
+//TODO: USER READ ALL MESSAGES
+//TODO: USER READ MESSAGES BY PARAMS --> UPDATE | DELETE [FINDBYPARAMS]
+//TODO: USER READ MESSAGES BY ID --> UPDATE | DELETE [FINDBYUNIQUE]
+//TODO: USER UPDATE MESSAGES
+//TODO: USER DELETE MESSAGES
+
 @Controller('message')
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}

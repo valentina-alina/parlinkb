@@ -189,6 +189,8 @@ model UserHasChildren {
   @@index([childId(191)], map: "child_id")
 }
 
+
+//? avec UserGroup
 model UserGroupHasUsers {
   userId       String    @db.VarChar(191)
   userGroupId  String    @db.VarChar(191)

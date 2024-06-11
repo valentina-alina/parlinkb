@@ -5,7 +5,13 @@ import { CreateChildDto } from './dto/create-child.dto';
 import { UpdateChildDto } from './dto/update-child.dto';
 
 
-//TODO:
+//TODO: CREATE CHILD
+//TODO: READ ALL CHILDREN
+//TODO: READ CHILD BY PARAMS [FINDBYPARAMS]
+//TODO: READ CHILD BY ID [FINDBYID]
+//TODO: UPDATE CHILDREN
+//TODO: DELETE CHILDREN
+
 @Controller('child')
 export class ChildController {
   constructor(private readonly childService: ChildService) {}

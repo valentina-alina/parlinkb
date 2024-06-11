@@ -4,7 +4,13 @@ import { UserGroupService } from './user-group.service';
 import { CreateUserGroupDto } from './dto/create-user-group.dto';
 import { UpdateUserGroupDto } from './dto/update-user-group.dto';
 
-//TODO:
+//TODO: USER CREATE USER GROUP
+//TODO: USER READ ALL USER GROUPS
+//TODO: USER READ USER GROUPS BY PARAMS --> UPDATE | DELETE [FINDBYPARAMS]
+//TODO: USER READ USER GROUPS BY ID --> UPDATE | DELETE [FINDBYUNIQUE]
+//TODO: USER UPDATE USER GROUPS
+//TODO: USER DELETE USER GROUPS
+
 @Controller('user-group')
 export class UserGroupController {
   constructor(private readonly userGroupService: UserGroupService) {}

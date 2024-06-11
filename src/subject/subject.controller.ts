@@ -4,7 +4,12 @@ import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 
-//TODO:
+//TODO: //FIXME: CREATE SUBJECTS ??
+//TODO: //FIXME: READ ALL SUBJECTS ??
+//TODO: //FIXME: READ SUBJECT BY PARAMS [FINDBYPARAMS] ??
+//TODO: //FIXME: READ SUBJECT BY ID [FINDBYID] ??
+//TODO: //FIXME: UPDATE SUBJECTS ??
+//TODO: //FIXME: DELETE SUBJECTS ??
 @Controller('subject')
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}

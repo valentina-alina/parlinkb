@@ -5,7 +5,13 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 
-//TODO:
+//TODO: CREATE CATEGORY | SUBCATEGORY
+//TODO: READ ALL CATEGORIES | SUBCATEGORIES
+//TODO: READ CATEGORY | SUBCATEGORY BY PARAMS [FINDBYPARAMS]  -->  UPDATE | DELETE [FINDBYPARAMS]
+//TODO: READ CATEGORY | SUBCATEGORY BY ID [FINDBYID] -->  UPDATE | DELETE [FINDBYID]
+//TODO: UPDATE CATEGORIES | SUBCATEGORIES
+//TODO: DELETE CATEGORIES | SUBCATEGORIES
+
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
