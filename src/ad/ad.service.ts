@@ -1,28 +1,37 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { CreateAdDto } from './dto/create-ad.dto';
-import { UpdateAdDto } from './dto/update-ad.dto';
+import { Ad } from '@prisma/client';
+// import { CreateAdDto } from './dto/create-ad.dto';
+// import { UpdateAdDto } from './dto/update-ad.dto';
+import { PrismaService } from 'prisma/prisma.service';
 
 //TODO:
 @Injectable()
 export class AdService {
-  create(createAdDto: CreateAdDto) {
-    return 'This action adds a new ad';
-  }
 
-  findAll() {
+  private ads: Ad[] = [];
+
+  constructor(private prisma: PrismaService) {}
+
+  /* async create(data: CreateAdDto): Promise<Ad> {
+    return this.prisma.ad.create({
+        data,
+    })
+  }
+ */
+  async findAll() {
     return `This action returns all ad`;
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return `This action returns a #${id} ad`;
   }
 
-  update(id: number, updateAdDto: UpdateAdDto) {
+  /* async update(id: number, updateAdDto: UpdateAdDto) {
     return `This action updates a #${id} ad`;
-  }
+  } */
 
-  remove(id: number) {
+  async remove(id: number) {
     return `This action removes a #${id} ad`;
   }
 }
