@@ -17,10 +17,6 @@ export class AdService {
     })
   }
  */
-  
-  async findAll(): Promise<Ad[]>{
-    return this.prisma.ad.findMany();
-  }
 
   async findAllByParams(options: Prisma.AdFindManyArgs): Promise<Ad[]>{
     return this.prisma.ad.findMany(options);
