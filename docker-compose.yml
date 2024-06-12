@@ -41,8 +41,6 @@ services:
       - "3000:3000"
     expose:
       - "3000"
-    volumes:
-      - .:/usr/app
     depends_on:
       - mariadb
 
