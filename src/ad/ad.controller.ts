@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, /* Post, Body, Patch, */ Param, Delete } from '@nestjs/common';
+import { Controller, Get, /* Post, Body, Patch, */ Param, Delete, Query } from '@nestjs/common';
 import { AdService } from './ad.service';
+import { Ad } from '@prisma/client';
 // import { CreateAdDto } from './dto/create-ad.dto';
 // import { UpdateAdDto } from './dto/update-ad.dto';
 
@@ -37,14 +38,34 @@ export class AdController {
   } */
 
   @Get()
-  findAll() {
+  async findAll(): Promise<Ad[]> {
     return this.adService.findAll();
   }
 
-  @Get(':id')
+  @Get()
+  async findAllByParams(@Query() query: {skip?: string, take?: string}): Promise<Ad[]> {
+      return this.adService.findAllByParams(+query.skip, +query.take);
+  }
+
+  /* @Get(':id')
   findOne(@Param('id') id: string) {
     return this.adService.findOne(+id);
+  } */
+
+  @Get(':id')
+  async readRoute(
+      @Param('id') id: string,
+  ): Promise<Ad | { error: boolean, message: string }> {
+  
+    const ad = await this.adService.findByUnique({ id });
+
+    if (!ad) {
+      return { error: true, message: "Pas d'annonce à  l'id" + id};
+    }
+
+    return ad;
   }
+
 
 /*   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAdDto: UpdateAdDto) {

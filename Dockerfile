@@ -28,4 +28,4 @@ ENV SERVER_PORT 3000
 EXPOSE $SERVER_PORT
 
 # Start the app
-CMD [ "npm", "run", "start:dev" ]
+CMD ["nodemon", "--watch", ".", "--exec", "npm", "run", "start:dev"]
