@@ -38,11 +38,6 @@ export class AdController {
   } */
 
   @Get()
-  async findAll(): Promise<Ad[]> {
-    return this.adService.findAll();
-  }
-
-  @Get()
   async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<Ad[]> {
     const new_options: Prisma.AdFindManyArgs = {}
     options.skip? new_options.skip = +options.skip : null
