@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, /* Post, Body, Patch, */ Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, /* Post, Body, Patch, */ Param, Delete, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { AdService } from './ad.service';
 import { Ad, Prisma } from '@prisma/client';
 // import { CreateAdDto } from './dto/create-ad.dto';
@@ -51,25 +51,20 @@ export class AdController {
     return this.adService.findAllByParams(new_options);
   }
 
-  /* @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adService.findOne(+id);
-  } */
-
   @Get(':id')
   async readRoute(
       @Param('id') id: string,
-  ): Promise<Ad | { error: boolean, message: string }> {
+  ): Promise<Ad | { message: string }> {
   
     const ad = await this.adService.findByUnique({ id });
 
-    if (!ad) {
-      return { error: true, message: "Pas d'annonce à  l'id" + id};
-    }
+    if (!ad) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
 
-    return ad;
+    return {
+      ...ad,
+      message: `Annonce avec l'id ${id}`
+    };
   }
-
 
 /*   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAdDto: UpdateAdDto) {
