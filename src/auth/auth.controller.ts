@@ -42,21 +42,19 @@ export class AuthController {
         @Body() data: { firstName: string, lastName: string, email: string, password: string}
     ): Promise<any> {
         const user = await this.userService.findByUnique({
-            email: data.email,
-            id: ""
+            email: data.email
         })
 
-        if(user) {
-            return new HttpException('Server error', 401)
-        }
+        if(user) return new HttpException('Server error', 401)
 
         data.password = await this.authService.hash(data.password);
 
         const new_user = await this.userService.create(data);
 
+        delete new_user.password;
+
         return {
             user: new_user,
-            date: new Date(),
             message: "utilisateur créé",
         }
     }
@@ -69,14 +67,11 @@ export class AuthController {
             email: data.email
         })
         
-        if(!user) {
-            throw new HttpException('Les identifiants ne correspondent pas - test1', 401)
-        }
+        if(!user) throw new HttpException('Les identifiants ne correspondent pas - test1', 401)
 
         const isValid = await bcrypt.compare(data.password, user.password)
-        if (!isValid) {
-            throw new HttpException('Les identifiants ne correspondent pas - test2', 401)
-        }
+
+        if (!isValid) throw new HttpException('Les identifiants ne correspondent pas - test2', 401)
 
         const payload = { sub: user.id, email: user.email}
 
@@ -99,9 +94,7 @@ export class AuthController {
     ) {
         const userId = String(req.user.sub);
         const user = await this.userService.findByUnique({id: userId})
-        if(!user) {
-            throw new HttpException('server error', 401)
-        }
+        if(!user) throw new HttpException('server error', 401)
 
         this.userService.update({id: user.id}, {refreshToken: ''})
         return {
@@ -115,9 +108,7 @@ export class AuthController {
         @Req() req: Request
     ) {
         const user = await this.userService.findByRefreshToken(req.refreshToken)
-        if(!user) {
-            throw new UnauthorizedException('server error')
-        }
+        if(!user) throw new UnauthorizedException('server error')
 
         const refresh_token = await this.jwtService.signAsync({sub: user.id, email: user.email}, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '8h'})
         this.userService.update({id: user.id}, {refreshToken: refresh_token})

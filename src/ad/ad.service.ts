@@ -9,8 +9,6 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class AdService {
 
-  private ads: Ad[] = [];
-
   constructor(private prisma: PrismaService) {}
 
   /* async create(data: CreateAdDto): Promise<Ad> {
@@ -24,22 +22,17 @@ export class AdService {
     return this.prisma.ad.findMany();
   }
 
-  async findAllByParams(skip?: number, take?: number, where?: any): Promise<Ad[]>{
-    return this.prisma.ad.findMany({
-        skip,
-        take,
-        where,
-    });
-}
+  async findAllByParams(options: Prisma.AdFindManyArgs): Promise<Ad[]>{
+    return this.prisma.ad.findMany(options);
+  }
 
   async findByUnique(
     adWhereUniqueInput: Prisma.AdWhereUniqueInput
   ): Promise<Ad | null> {
     return this.prisma.ad.findUnique({
-        where: adWhereUniqueInput
+      where: adWhereUniqueInput
     });
   }
-
 
   /* async update(id: number, updateAdDto: UpdateAdDto) {
     return `This action updates a #${id} ad`;

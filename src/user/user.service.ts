@@ -13,14 +13,14 @@ export class UserService {
 
   async create(data: CreateUserDto): Promise<User> {
     return this.prisma.user.create({
-        data,
+      data,
     })
   }
 
   async findByFirstName(firstName: string): Promise<User | null> {
     return this.prisma.user.findFirst({
         where: {
-            firstName: firstName
+          firstName: firstName
         },
     });
   }
@@ -28,7 +28,7 @@ export class UserService {
   async findByPassword(password: string): Promise<User | null> {
     return this.prisma.user.findFirst({
         where: {
-            password: password
+          password: password
         },
     });
   }
@@ -37,7 +37,7 @@ export class UserService {
     userWhereUniqueInput: Prisma.UserWhereUniqueInput
   ): Promise<User | null> {
     return this.prisma.user.findUnique({
-        where: userWhereUniqueInput
+      where: userWhereUniqueInput
     });
   }
 
@@ -53,12 +53,8 @@ export class UserService {
     );
   }
 
-  async findAll(skip?: number, take?: number, where?: any): Promise<User[]>{
-    return this.prisma.user.findMany({
-        skip,
-        take,
-        where,
-    });
+  async findAllByParams(options: Prisma.UserFindManyArgs): Promise<User[]>{
+    return this.prisma.user.findMany(options);
   }
 
   async update(
@@ -66,14 +62,14 @@ export class UserService {
     data: Prisma.UserUpdateInput
   ): Promise<User> {
     return this.prisma.user.update({
-        where,
-        data,
+      where,
+      data,
     });
   }
 
   async delete(where: Prisma.UserWhereUniqueInput): Promise<User> {
     return this.prisma.user.delete({
-        where,
+      where,
     })
   };
 }

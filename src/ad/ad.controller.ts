@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Get, /* Post, Body, Patch, */ Param, Delete, Query } from '@nestjs/common';
 import { AdService } from './ad.service';
-import { Ad } from '@prisma/client';
+import { Ad, Prisma } from '@prisma/client';
 // import { CreateAdDto } from './dto/create-ad.dto';
 // import { UpdateAdDto } from './dto/update-ad.dto';
 
@@ -43,8 +43,12 @@ export class AdController {
   }
 
   @Get()
-  async findAllByParams(@Query() query: {skip?: string, take?: string}): Promise<Ad[]> {
-      return this.adService.findAllByParams(+query.skip, +query.take);
+  async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<Ad[]> {
+    const new_options: Prisma.AdFindManyArgs = {}
+    options.skip? new_options.skip = +options.skip : null
+    options.take? new_options.take = +options.take : null
+
+    return this.adService.findAllByParams(new_options);
   }
 
   /* @Get(':id')
