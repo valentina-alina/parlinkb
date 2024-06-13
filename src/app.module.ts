@@ -12,9 +12,14 @@ import { SubjectModule } from './subject/subject.module';
 import { UserGroupModule } from './user-group/user-group.module';
 import { MessageModule } from './message/message.module';
 import { AuthModule } from './auth/auth.module';
+import { AppCacheModule } from './cache/cache.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // This makes the ConfigModule global, so you don't need to import it everywhere.
+    }),
     UserModule,
     AuthModule,
     ProfileModule,
@@ -25,6 +30,7 @@ import { AuthModule } from './auth/auth.module';
     SubjectModule,
     UserGroupModule,
     MessageModule,
+    AppCacheModule,
   ],
   controllers: [AppController],
   providers: [AppService],
