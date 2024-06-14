@@ -50,6 +50,15 @@ services:
     depends_on:
       - mariadb
       - redis
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /${WORK_DIR}
+          ignore:
+            - node_modules
+        - action: rebuild
+          path: package.json
 
 volumes:
   mariadb_data:
