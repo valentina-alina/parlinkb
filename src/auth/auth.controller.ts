@@ -17,7 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AuthRefreshGuard } from '../../src/guards/refresh.jwt.guards';
 import { User } from "@prisma/client";
-import { CustomException } from "src/exceptions/custom.exception";
+import { CustomException } from "../../src/exceptions/custom.exception";
 
 //TODO: EMAIL | ACCOUNT VERIFICATION | USER SIGNIN
 //TODO: USER SIGNOUT
