@@ -40,6 +40,7 @@ export class AuthController {
         return bcrypt.hash(data, 10);
     }
 
+    //TODO: + CHILD
     @Post('register')
     async signup(
         @Body() data: { firstName: string, lastName: string, email: string, password: string}
@@ -65,6 +66,7 @@ export class AuthController {
         }
     }
 
+    //TODO: USER
     @Post('login')
     async signin(
         @Body() data: { email: string, password: string}
@@ -98,6 +100,7 @@ export class AuthController {
         }
     }
 
+    //TODO: USER
     @UseGuards(AuthRefreshGuard)
     @Post('signout')
     async logout(
@@ -113,6 +116,7 @@ export class AuthController {
         }
     }
 
+    //FIXME: //?USER ?
     @UseGuards(AuthRefreshGuard)
     @Get('refresh_token')
     async refreshTokens(

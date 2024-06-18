@@ -17,8 +17,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
 import { CustomException } from '../exceptions/custom.exception';
 
-//TODO: CREATE USER + CREATE PROFILE --> SIGNUP | REGISTER  --> ASYNC CREATE() ??
-//TODO: DELETE USER + DELETE PROFILE --> DELETE | REMOVE
 //TODO: READ USER BY ID
 //TODO: READ ALL USERS
 
@@ -104,7 +102,7 @@ export class UserController {
 
   @Delete(':id')
     async deleteRoute(@Param('id') id: string,): Promise<User | { message: string }> {
-      
+
         const user = await this.userService.findByUnique({ id })
 
         if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
