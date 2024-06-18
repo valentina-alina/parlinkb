@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Put,  Param, Delete, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put,  Param, Delete, Query, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { AdService } from './ad.service';
 import { Ad, Prisma } from '@prisma/client';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { UserService } from '../../src/user/user.service';
+import { AuthGuard } from '../guards/jwt.guards';
 
 //TODO: ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
 //TODO: ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
@@ -37,6 +38,7 @@ export class AdController {
   ) {}
 
   @Post()
+  @UseGuards(AuthGuard)
   async create(@Body() data: CreateAdDto): Promise<{ ad: Ad, message: string}> {
 
     // vérifier si l'utilisateur existe
