@@ -104,9 +104,13 @@ export class UserController {
 
   @Delete(':id')
     async deleteRoute(@Param('id') id: string,): Promise<User | { message: string }> {
+      
         const user = await this.userService.findByUnique({ id })
+
         if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
+
         this.userService.delete({id });
+
         return { message: `L'utilisateur avec l'id ${ id } a bien été supprimé` }
     }
 }

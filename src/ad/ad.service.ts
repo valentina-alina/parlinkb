@@ -34,7 +34,9 @@ export class AdService {
     return `This action updates a #${id} ad`;
   } */
 
-  async remove(id: number) {
-    return `This action removes a #${id} ad`;
-  }
+  async delete(where: Prisma.AdWhereUniqueInput): Promise<Ad> {
+    return this.prisma.ad.delete({
+        where
+    })
+  };
 }

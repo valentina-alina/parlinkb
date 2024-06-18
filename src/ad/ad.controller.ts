@@ -53,7 +53,7 @@ export class AdController {
   
     const ad = await this.adService.findByUnique({ id });
 
-    if (!ad) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
+    if (!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
 
     return {
       ...ad,
@@ -67,7 +67,14 @@ export class AdController {
   } */
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adService.remove(+id);
+  async deleteRoute(@Param('id') id: string,): Promise<Ad | { message: string }> {
+    
+    const ad = await this.adService.findByUnique({ id })
+
+    if(!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
+
+    this.adService.delete({ id });
+
+    return { message: `L'annonce avec l'id ${id} a bien été supprimée` }
   }
 }
