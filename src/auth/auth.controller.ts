@@ -15,9 +15,11 @@ import { UserService } from '../user/user.service';
 import { Request as ExpressRequest } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 import { AuthRefreshGuard } from '../../src/guards/refresh.jwt.guards';
 import { User } from "@prisma/client";
 import { CustomException } from "../../src/exceptions/custom.exception";
+import { RegisterUserDto } from "./dto/register-user.dto copy";
 
 //TODO: EMAIL | ACCOUNT VERIFICATION | USER SIGNIN
 //TODO: USER SIGNOUT
@@ -43,21 +45,63 @@ export class AuthController {
     //TODO: + CHILD
     @Post('register')
     async signup(
-        @Body() data: { firstName: string, lastName: string, email: string, password: string}
+        @Body() data: RegisterUserDto
     ): Promise<{ user: User, message: string}> {
-        const user = await this.userService.findByUnique({
-            email: data.email
-        })
+       const mail = data["user"]["email"]
 
-        // if(user) throw new HttpException('Server error', 401)
+             
+        // verifier si email existe deja 
+       const user = await this.userService.findByUnique({ email: mail})
+
         if(user) throw new CustomException('L\'utilisateur existe déjà', HttpStatus.CONFLICT, "UC-create-1")
+           
+      const passwordIni = await this.authService.hash(this.authService.generateRandomPassword(10));
 
-        data.password = await this.authService.hash(data.password);
+        // creer nouveau utilisateur
+        const new_user = await this.userService.create({...data["user"], password : passwordIni});
 
-        const new_user = await this.userService.create(data);
+         // si subject exite dans data body
+            
+         if(data["subject"])
+            {
+            const subjects=data["subject"];
+             
+subjects.forEach(sub => {
+    // chercher subject by name
+    //TODO const subject = await this.subjectService.findByUnique({ name: sub });
+    // faire jointure user id-subject id
+    // TODO   const new_user-has-profile = await this.uhpService.create({subject.id,new_user.id});
+  console.log(`Processed subject: ${sub} - ${new_user.id}`);
+});
+}
+        // si children existe dans data body
+        if(data["children"])
+            {
+            const children=data["children"];
+             
+children.forEach(child => {
+    // chercher si child existe by first name and lastname
+    //TODO const childTable= await this.childService.findByUnique({ firstName: child.firstName, lastName:child.lasName });
+    //  if (!childTable) 
+    // creer child
 
-        delete new_user.password;
+    // faire jointure user id-subject id
+    // TODO   const new_user-has-profile = await this.uhpService.create({subject.id,new_user.id});
+  console.log(`Processed subject: ${child.firstName} - ${new_user.id}`);
+});
+}
+        // for chaque enfant () for n children : 
 
+        // si enfnat not in bdd
+        // const child= await this.childService.findByUnique({ firstName: firstName,lastName:lastName})
+ // creer enfant --apeller post child du controleur child
+
+ //  associer enfant au parents : creer jointure
+
+
+       
+
+       
         const message = `Utilisateur créé`;
 
         return {
