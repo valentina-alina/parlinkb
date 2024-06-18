@@ -1,9 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, /* Post,*/ Body, Put,  Param, Delete, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put,  Param, Delete, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { AdService } from './ad.service';
 import { Ad, Prisma } from '@prisma/client';
-// import { CreateAdDto } from './dto/create-ad.dto';
+import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
+import { UserService } from '../../src/user/user.service';
 
 //TODO: ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
 //TODO: ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
@@ -30,12 +31,45 @@ import { UpdateAdDto } from './dto/update-ad.dto';
 
 @Controller('ad')
 export class AdController {
-  constructor(private readonly adService: AdService) {}
+  constructor(
+    private readonly adService: AdService,
+    private readonly userService: UserService,
+  ) {}
 
-/*   @Post()
-  create(@Body() createAdDto: CreateAdDto) {
-    return this.adService.create(createAdDto);
-  } */
+  @Post()
+  async create(@Body() data: CreateAdDto): Promise<{ ad: Ad, message: string}> {
+
+    // vérifier si l'utilisateur existe
+    const user = await this.userService.findByUnique({id : data.userId})
+      if (!user) throw new HttpException(`L'utilisateur n'existe pas`, HttpStatus.CONFLICT)
+
+    const new_ad =  await this.adService.create({
+      title: data.title,
+      description: data.description,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      duration: data.duration,
+      address: data.address,
+      postalCode: data.postalCode,
+      city: data.city,
+      country: data.country,
+      attendees: data.attendees,
+      transport: data.transport,
+      conform: data.conform,
+      status: data.status,
+      adPicture: data.adPicture,
+      users: { connect: { id: data.userId } },
+      category: { connect: { id: data.categoryId } },
+      subCategory: { connect: { id: data.subCategoryId } },
+    });
+
+    const message = `L'annonce a bien été créée`
+
+    return {
+      ad: new_ad,
+      message
+    }
+  }
 
   @Get()
   async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<Ad[]> {

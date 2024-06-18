@@ -5,18 +5,16 @@ import { Ad, Prisma } from '@prisma/client';
 // import { UpdateAdDto } from './dto/update-ad.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 
-//TODO:
 @Injectable()
 export class AdService {
 
   constructor(private prisma: PrismaService) {}
 
-  /* async create(data: CreateAdDto): Promise<Ad> {
+  async create(data: Prisma.AdCreateInput): Promise<Ad> {
     return this.prisma.ad.create({
         data,
     })
   }
- */
 
   async findAllByParams(options: Prisma.AdFindManyArgs): Promise<Ad[]>{
     return this.prisma.ad.findMany(options);
