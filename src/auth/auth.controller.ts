@@ -68,7 +68,7 @@ export class AuthController {
     @Post('login')
     async signin(
         @Body() data: { email: string, password: string}
-    ): Promise<{ access_token: string, refresh_token: string, user: User}> {
+    ): Promise<{ access_token: string, refresh_token: string, user: User, message: string}> {
         const user = await this.userService.findByUnique({
             email: data.email
         })
@@ -88,10 +88,13 @@ export class AuthController {
         const refresh_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '7d'});
 
         this.userService.update({ id: payload.sub }, { refreshToken: refresh_token });
+
+        const message = `Vous êtes bien connecté`;
         return {
             access_token,
             refresh_token,
-            user
+            user,
+            message
         }
     }
 
