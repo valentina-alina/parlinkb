@@ -30,9 +30,15 @@ export class AdService {
     });
   }
 
-  /* async update(id: number, updateAdDto: UpdateAdDto) {
-    return `This action updates a #${id} ad`;
-  } */
+  async update(
+    where: Prisma.AdWhereUniqueInput,
+    data: Prisma.AdUpdateInput
+  ): Promise<Ad> {
+    return this.prisma.ad.update({
+      where,
+      data,
+    });
+  }
 
   async delete(where: Prisma.AdWhereUniqueInput): Promise<Ad> {
     return this.prisma.ad.delete({

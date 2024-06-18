@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, /* Post, Body, Patch, */ Param, Delete, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, /* Post,*/ Body, Put,  Param, Delete, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { AdService } from './ad.service';
 import { Ad, Prisma } from '@prisma/client';
 // import { CreateAdDto } from './dto/create-ad.dto';
-// import { UpdateAdDto } from './dto/update-ad.dto';
+import { UpdateAdDto } from './dto/update-ad.dto';
 
 //TODO: ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
 //TODO: ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
@@ -61,14 +61,28 @@ export class AdController {
     };
   }
 
-/*   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdDto: UpdateAdDto) {
-    return this.adService.update(+id, updateAdDto);
-  } */
+  @Put(':id')
+  async updateRoute(
+      @Param('id') id: string,
+      @Body() adUpdateDto: UpdateAdDto,
+  ): Promise<{ad: Ad, message: string}> {
+      const ad = await this.adService.findByUnique({ id });
+      
+      if (!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
+
+      const adUpdate = await this.adService.update({ id }, adUpdateDto);
+
+      const message = `L'annonce avec l'id ${id} a bien été mise à jour`;
+
+      return {
+        ad: adUpdate,
+        message
+      }
+  }
 
   @Delete(':id')
   async deleteRoute(@Param('id') id: string,): Promise<Ad | { message: string }> {
-    
+
     const ad = await this.adService.findByUnique({ id })
 
     if(!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
