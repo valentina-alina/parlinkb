@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Prisma, User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CacheService } from '../cache/cache.service';
+import { da } from '@faker-js/faker';
 
 @Injectable()
 export class UserService {
@@ -15,9 +16,9 @@ export class UserService {
   ) {}
 
   async create(data: CreateUserDto): Promise<User> {
-    const user = await this.prisma.user.create({
-      data,
-    });
+    const user = await this.prisma.user.create(
+      {data: {role : data.role, firstName : data.firstName, lastName: data.lastName, email :data.email, password:data.password}}
+    );
     await this.cacheService.set(`user:${user.id}`, user, this.CACHE_TTL);
     return user;
   }
@@ -104,4 +105,5 @@ export class UserService {
     await this.cacheService.del(`user:${user.id}`);
     return user;
   }
+ 
 }
