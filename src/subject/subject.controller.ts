@@ -58,17 +58,36 @@ export class SubjectController {
     };
   }
 
+  // @Delete(':id')
+  // async remove(@Param('id') id: string): Promise<Subject | string> {
+  //   const subject = await this.service.findByUnique({ id });
+
+  //   if (!subject) throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.CONFLICT);
+
+  //   const out = await this.service.delete({ id });
+
+  //   const message = `Subject avec l'id ${id} a été supprimé`;
+  //   return {out, 
+  //     message
+  //   };
+  // }
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<{ message: string }> {
+  async remove(@Param('id') id: string): Promise<{ subject?: Subject; message: string }> {
     const subject = await this.service.findByUnique({ id });
 
-    if (!subject) throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.CONFLICT);
+    if (!subject) {
+      throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+    }
 
-    await this.service.delete({ id });
+    const result = await this.service.delete({ id });
+
+    if (typeof result === 'string') {
+      // Si result est un message d'erreur, lancer une exception HTTP
+      throw new HttpException(result, HttpStatus.CONFLICT);
+    }
 
     const message = `Subject avec l'id ${id} a été supprimé`;
-    return {
-      message
-    };
+    return { subject: result, message };
   }
 }
+

@@ -3,31 +3,24 @@ import { IsNotEmpty, IsString, MinLength, MaxLength, IsAlpha, IsEmail } from 'cl
 import { ApiProperty } from '@nestjs/swagger';
 //TODO:
 export class CreateChildDto {
-    @IsNotEmpty()
+    
     @IsString()
-    @MinLength(2, { message: 'Le prénom doit comporter plus 4 caractères'})
-    @MaxLength(20, { message: 'Le prénom doit comporter moins de 20 caractères'})
-    @IsAlpha()
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     firstName: string;
-
-    @IsNotEmpty()
+  
     @IsString()
-    @MinLength(2, { message: 'Le prénom doit comporter plus 4 caractères'})
-    @MaxLength(20, { message: 'Le prénom doit comporter moins de 20 caractères'})
-    @IsAlpha()
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     lastName: string;
-
-       
-    @IsNotEmpty()
+  
     @IsString()
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     school: string;
-
-      
-    @IsNotEmpty()
+  
     @IsString()
+    @IsNotEmpty()
     @ApiProperty({ required: true })
-    classe: string;
+    class: string;
 }

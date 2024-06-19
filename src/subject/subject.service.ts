@@ -3,79 +3,89 @@ import { Injectable } from '@nestjs/common';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 
-import { CacheService } from '../cache/cache.service';
-import { Prisma, Subject} from '@prisma/client';
+import { Prisma, Subject } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PRISMA_ERRORS } from '../../prisma/prisma.errors';
 
 @Injectable()
 export class SubjectService {
 
-  private readonly CACHE_TTL = 3600; // Cache TTL in seconds
+ 
 
   constructor(
     private readonly prisma: PrismaService,
-    // private readonly cacheService: CacheService
+  
   ) {}
 
-  async create(inputDto: CreateSubjectDto): Promise<Subject>{
-    const out = await this.prisma.subject.create(
-      {data: {name : inputDto.name}});
-       return out;
-  }
-  
-  async findAllByParams(options: Prisma.SubjectFindManyArgs): Promise<Subject[]> {
-    // const cacheKey = `suject:params:${JSON.stringify(options)}`;
-    // let subjects = await this.cacheService.get(cacheKey);
-    if (!options) {
-      // subjects = await this.prisma.subject.findMany();
-      // await this.cacheService.set(cacheKey, subjects, this.CACHE_TTL);
+  async create(inputDto: CreateSubjectDto): Promise<Subject | string> {
+    try {
+      const out = await this.prisma.subject.create({ data: { name: inputDto.name } });
+      return out;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        const errorMessage = PRISMA_ERRORS[error.code] ? `Prisma error-${error.code}: ${PRISMA_ERRORS[error.code]}` : `Unexpected error: ${error.message}`;
+        return errorMessage;
+      }
+      return `Unexpected error: ${error.message}`;
     }
-    return await this.prisma.subject.findMany(options);
   }
 
-  async findByUnique(subjectWhereUniqueInput: Prisma.SubjectWhereUniqueInput): Promise<Subject> {
-    // const cacheKey = `user:unique:${JSON.stringify(userWhereUniqueInput)}`;
-    // let user = await this.cacheService.get(cacheKey);
-    // if (!user) {
-    const subject = await this.prisma.subject.findUnique({
-        where: subjectWhereUniqueInput,
+  async findAllByParams(options: Prisma.SubjectFindManyArgs): Promise<Subject[] | string> {
+    try {
+      return await this.prisma.subject.findMany(options);
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        const errorMessage = PRISMA_ERRORS[error.code] ? `Prisma error-${error.code}: ${PRISMA_ERRORS[error.code]}` : `Unexpected error: ${error.message}`;
+        return errorMessage;
+      }
+      return `Unexpected error: ${error.message}`;
+    }
+  }
+
+  async findByUnique(WhereUniqueInput: Prisma.SubjectWhereUniqueInput): Promise<Subject | string> {
+    try {
+      const subject = await this.prisma.subject.findUnique({
+        where: WhereUniqueInput,
       });
-      // if (subject) {
-      //   await this.cacheService.set(cacheKey, user, this.CACHE_TTL);
-      // }
-       return subject; }
-
-
-
-  async update(where: Prisma.SubjectWhereUniqueInput, data: Prisma.SubjectUpdateInput): Promise<Subject> {
-    const output= await this.prisma.subject.update({
-      where,
-      data,
-    });
-    // await this.cacheService.set(`subjects:${output.id}`, output, this.CACHE_TTL);
-    return output;
+      return subject;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        const errorMessage = PRISMA_ERRORS[error.code] ? `Prisma error-${error.code}: ${PRISMA_ERRORS[error.code]}` : `Unexpected error: ${error.message}`;
+        return errorMessage;
+      }
+      return `Unexpected error: ${error.message}`;
+    }
   }
 
-  async delete(where: Prisma.SubjectWhereUniqueInput): Promise<Subject> {
-    return  this.prisma.subject.delete({
-      where,
-    });
-    // await this.cacheService.del(`subjects:${output.id}`);
-    // return output;
+  async update(where: Prisma.SubjectWhereUniqueInput, data: Prisma.SubjectUpdateInput): Promise<Subject | string> {
+    try {
+      const output = await this.prisma.subject.update({
+        where,
+        data,
+      });
+      return output;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        const errorMessage = PRISMA_ERRORS[error.code] ? `Prisma error-${error.code}: ${PRISMA_ERRORS[error.code]}` : `Unexpected error: ${error.message}`;
+        return errorMessage;
+      }
+      return `Unexpected error: ${error.message}`;
+    }
   }
-  // findAll() {
-  //   return `This action returns all subject`;
-  // }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} subject`;
-  // }
-
-  // update(id: number, updateSubjectDto: UpdateSubjectDto) {
-  //   return `This action updates a #${id} subject`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} subject`;
-  // }
+  async delete(where: Prisma.SubjectWhereUniqueInput): Promise<Subject | string> {
+    try {
+      const output = await this.prisma.subject.delete({
+        where,
+      });
+      return output;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        const errorMessage = PRISMA_ERRORS[error.code] ? `Prisma error-${error.code}: ${PRISMA_ERRORS[error.code]}` : `Unexpected error: ${error.message}`;
+        return errorMessage;
+      }
+      return `Unexpected error: ${error.message}`;
+    }
+  }
 }
