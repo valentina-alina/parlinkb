@@ -97,14 +97,14 @@ export class AdController {
   @Get(':id')
   async readRoute(
       @Param('id') id: string,
-  ): Promise<Ad | { message: string }> {
+  ): Promise<{ ad: Ad, message: string}> {
   
     const ad = await this.adService.findByUnique({ id });
 
     if (!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
 
     return {
-      ...ad,
+      ad,
       message: `Annonce avec l'id ${id}`
     };
   }
