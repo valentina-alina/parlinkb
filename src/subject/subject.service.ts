@@ -43,6 +43,28 @@ export class SubjectService {
     }
   }
 
+  async findAllByName(name: string): Promise<Subject | string> {
+    try {
+      const subjects = await this.prisma.subject.findMany({
+        where: {
+          name: {
+            contains: name
+          
+          },
+        },
+      });
+      return subjects[0];
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        const errorMessage = PRISMA_ERRORS[error.code]
+          ? `Prisma error-${error.code}: ${PRISMA_ERRORS[error.code]}`
+          : `Unexpected error: ${error.message}`;
+        return errorMessage;
+      }
+      return `Unexpected error: ${error.message}`;
+    }
+  }
+
   async findByUnique(WhereUniqueInput: Prisma.SubjectWhereUniqueInput): Promise<Subject | string> {
     try {
       const subject = await this.prisma.subject.findUnique({

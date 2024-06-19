@@ -21,11 +21,24 @@ export class SubjectController {
     };
   }
 
+
   @Get()
-  async findAllByParams(@Query() query: { skip?: string, take?: string }): Promise<{ [key: string]: Subject[] | string }> {
-    const prismaOptions: Prisma.SubjectFindManyArgs = {};
+  async findAllByParams(@Query() query: { skip?: string, take?: string, name?: string }): Promise<{ [key: string]: Subject[] | string }> {
+    const prismaOptions: Prisma.SubjectFindManyArgs = {
+      where: {}
+    };
+    
     if (query.skip) prismaOptions.skip = +query.skip;
     if (query.take) prismaOptions.take = +query.take;
+    if (query.name) {
+      prismaOptions.where = {
+        ...prismaOptions.where,
+        name: {
+          contains: query.name
+    
+        }
+      };
+    }
 
     const out = await this.service.findAllByParams(prismaOptions);
     const message = `All subjects`;
@@ -34,6 +47,7 @@ export class SubjectController {
       message
     };
   }
+
 
   @Get(':id')
   async readRoute(@Param('id') id: string): Promise<{ [key: string]: Subject | string }> {
@@ -58,19 +72,7 @@ export class SubjectController {
     };
   }
 
-  // @Delete(':id')
-  // async remove(@Param('id') id: string): Promise<Subject | string> {
-  //   const subject = await this.service.findByUnique({ id });
 
-  //   if (!subject) throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.CONFLICT);
-
-  //   const out = await this.service.delete({ id });
-
-  //   const message = `Subject avec l'id ${id} a été supprimé`;
-  //   return {out, 
-  //     message
-  //   };
-  // }
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<{ subject?: Subject; message: string }> {
     const subject = await this.service.findByUnique({ id });

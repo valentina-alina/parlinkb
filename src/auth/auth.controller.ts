@@ -12,6 +12,7 @@ import {
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { UserService } from '../user/user.service';
+
 import { Request as ExpressRequest } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -20,6 +21,8 @@ import { AuthRefreshGuard } from '../../src/guards/refresh.jwt.guards';
 import { User } from "@prisma/client";
 import { CustomException } from "../../src/exceptions/custom.exception";
 import { RegisterUserDto } from "./dto/register-user.dto copy";
+
+import { SubjectService } from "../subject/subject.service";
 
 //TODO: EMAIL | ACCOUNT VERIFICATION | USER SIGNIN
 //TODO: USER SIGNOUT
@@ -35,7 +38,8 @@ export class AuthController {
     constructor (
         private authService: AuthService,
         private userService: UserService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private subjectService: SubjectService
     ) {}
 
     hashData(data:string) {
@@ -66,12 +70,17 @@ export class AuthController {
             {
             const subjects=data["subject"];
              
-subjects.forEach(sub => {
+subjects.forEach(async sub =>  {
+
     // chercher subject by name
+    
+    const subject =  await this.subjectService.findAllByName(sub);
+    console.log(subject);
     //TODO const subject = await this.subjectService.findByUnique({ name: sub });
     // faire jointure user id-subject id
-    // TODO   const new_user-has-profile = await this.uhpService.create({subject.id,new_user.id});
-  console.log(`Processed subject: ${sub} - ${new_user.id}`);
+    // TODO   const new_user-has-subject = await this.uhpService.create({subject.id,new_user.id});
+  console.log(`Processed subject: ${sub} - ${new_user["id"]} - ${subject["id"]}`);
+//   console.log(subject[0]);
 });
 }
         // si children existe dans data body
@@ -87,7 +96,7 @@ children.forEach(child => {
 
     // faire jointure user id-subject id
     // TODO   const new_user-has-profile = await this.uhpService.create({subject.id,new_user.id});
-  console.log(`Processed subject: ${child.firstName} - ${new_user.id}`);
+  console.log(`Processed child: ${child.firstName} - ${new_user.id}`);
 });
 }
         // for chaque enfant () for n children : 
