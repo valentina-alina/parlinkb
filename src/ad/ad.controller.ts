@@ -10,7 +10,7 @@ import { GetAdsFilterDto } from './dto/get-ads-filter.dto';
 import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
 
 //? ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
-//TODO: ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
+//? ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
 //TODO: ROUTE PAGINATION??
 //TODO: ROUTE AFFICHER ANNONCE PAR UTILISATEUR [OU DANS USER.CONTROLLER??]
 
