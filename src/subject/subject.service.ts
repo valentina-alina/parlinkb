@@ -7,10 +7,6 @@ import { CacheService } from '../cache/cache.service';
 import { Prisma, Subject} from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
-
-
-
-//TODO:
 @Injectable()
 export class SubjectService {
 
@@ -21,10 +17,10 @@ export class SubjectService {
     // private readonly cacheService: CacheService
   ) {}
 
-  async create(input: CreateSubjectDto): Promise<Subject>{
-    const output = await this.prisma.subject.create(
-      {data: {name : input.name}});
-       return output;
+  async create(inputDto: CreateSubjectDto): Promise<Subject>{
+    const out = await this.prisma.subject.create(
+      {data: {name : inputDto.name}});
+       return out;
   }
   
   async findAllByParams(options: Prisma.SubjectFindManyArgs): Promise<Subject[]> {
@@ -61,11 +57,11 @@ export class SubjectService {
   }
 
   async delete(where: Prisma.SubjectWhereUniqueInput): Promise<Subject> {
-    const output = await this.prisma.subject.delete({
+    return  this.prisma.subject.delete({
       where,
     });
     // await this.cacheService.del(`subjects:${output.id}`);
-    return output;
+    // return output;
   }
   // findAll() {
   //   return `This action returns all subject`;
