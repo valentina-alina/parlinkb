@@ -6,8 +6,10 @@ import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { UserService } from '../../src/user/user.service';
 import { AuthGuard } from '../guards/jwt.guards';
+import { GetAdsFilterDto } from './dto/get-ads-filter.dto';
+import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
 
-//TODO: ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
+//? ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
 //TODO: ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
 //TODO: ROUTE PAGINATION??
 //TODO: ROUTE AFFICHER ANNONCE PAR UTILISATEUR [OU DANS USER.CONTROLLER??]
@@ -74,6 +76,22 @@ export class AdController {
     options.take? new_options.take = +options.take : null
 
     return this.adService.findAllByParams(new_options);
+  }
+
+  @Get('params')
+  async findAllByFilters(
+    @Query() {search}: GetAdsFilterDto,
+  ): Promise<Ad[]> {
+
+    return this.adService.findAllByFilters(search);
+  }
+
+  @Get('categories')
+  async findAllByCategories(
+    @Query() categoryParams: GetAdsCategoryDto,
+  ): Promise<Ad[]> {
+
+    return this.adService.findAllByCategories(categoryParams);
   }
 
   @Get(':id')
