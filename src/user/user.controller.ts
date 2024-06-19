@@ -82,12 +82,6 @@ export class UserController {
       
       if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
 
-      const user_email = await this.userService.findByUnique({
-        email: userUpdateDto.email
-      });
-
-      if(!user_email) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
-
       const userUpdate = await this.userService.update({ id }, userUpdateDto);
 
       delete userUpdate.password;
