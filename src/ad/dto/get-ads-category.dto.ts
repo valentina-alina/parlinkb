@@ -5,7 +5,8 @@ import { IsOptional, IsString } from "class-validator";
 export class GetAdsCategoryDto {
 
     @IsString()
-    categoryName: string;
+    @IsOptional()
+    categoryName?: string | null;
 
     @IsString()
     @IsOptional()
