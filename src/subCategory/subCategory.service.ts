@@ -1,0 +1,27 @@
+/* eslint-disable prettier/prettier */
+import { Injectable } from '@nestjs/common';
+import { CreateSubCategoryDto } from './dto/create-subCategory.dto';
+import { UpdateSubCategoryDto } from './dto/update-subCategory.dto';
+
+@Injectable()
+export class SubCategoryService {
+  create(createSubCategoryDto: CreateSubCategoryDto) {
+    return 'This action adds a new subCategory';
+  }
+
+  findAll() {
+    return `This action returns all subCategory`;
+  }
+
+  findOne(id: number) {
+    return `This action returns a #${id} subCategory`;
+  }
+
+  update(id: number, updateSubCategoryDto: UpdateSubCategoryDto) {
+    return `This action updates a #${id} subCategory`;
+  }
+
+  remove(id: number) {
+    return `This action removes a #${id} subCategory`;
+  }
+}

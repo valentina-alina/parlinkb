@@ -14,6 +14,7 @@ import { MessageModule } from './message/message.module';
 import { AuthModule } from './auth/auth.module';
 import { AppCacheModule } from './cache/cache.module';
 import { ConfigModule } from '@nestjs/config';
+import { SubCategoryModule } from './subCategory/subCategory.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ConfigModule } from '@nestjs/config';
     UserGroupModule,
     MessageModule,
     AppCacheModule,
+    SubCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
