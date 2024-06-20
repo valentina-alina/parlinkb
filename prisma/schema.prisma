@@ -15,7 +15,7 @@ datasource db {
 
 model Category {
   id        String    @id @default(cuid()) @db.VarChar(191)
-  name      String    @db.VarChar(50)
+  name      String    @db.VarChar(50) @unique
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now()) @updatedAt
   ads       Ad[]
@@ -24,7 +24,7 @@ model Category {
 
 model SubCategory {
   id        String    @id @default(cuid()) @db.VarChar(191)
-  name      String    @db.VarChar(50)
+  name      String    @db.VarChar(50) @unique
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now()) @updatedAt
   ads       Ad[]
@@ -36,7 +36,7 @@ model SubCategory {
 
 model Subject {
   id        String    @id @default(cuid()) @db.VarChar(191)
-  name      String    @db.VarChar(50)
+  name      String    @db.VarChar(50) @unique
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now()) @updatedAt
   userHasSubjects UserHasSubjects[]
@@ -52,7 +52,7 @@ model User {
   role       UserRole   @default(admin)
   status     UserStatus @default(activated)
   password   String     @db.VarChar(100)
-  refreshToken String?  @db.VarChar(100)
+  refreshToken String?  @db.VarChar(255)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now()) @updatedAt
   Profile    Profile?
@@ -140,7 +140,7 @@ model File {
 
 model UserGroup {
   id         String    @id @default(cuid()) @db.VarChar(191)
-  nom        String?   @db.VarChar(50)
+  name        String?   @db.VarChar(50) @unique
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @default(now()) @updatedAt
   userId     String    @db.VarChar(191)
