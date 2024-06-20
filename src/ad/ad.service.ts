@@ -5,6 +5,7 @@ import { Ad, Prisma } from '@prisma/client';
 // import { UpdateAdDto } from './dto/update-ad.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
+// import { GetAdsUserDto } from './dto/get-ads-user.dto';
 
 @Injectable()
 export class AdService {
@@ -59,6 +60,16 @@ export class AdService {
             },
           },
         ],
+      }
+    })
+  }
+
+  async findAllByUser(query: string): Promise<Ad[]>{
+    return this.prisma.ad.findMany({
+      where: {
+        users: {
+          id: query
+        }
       }
     })
   }

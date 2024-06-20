@@ -8,6 +8,7 @@ import { UserService } from '../../src/user/user.service';
 import { AuthGuard } from '../guards/jwt.guards';
 import { GetAdsFilterDto } from './dto/get-ads-filter.dto';
 import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
+import { GetAdsUserDto } from './dto/get-ads-user.dto';
 
 //? ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
 //? ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
@@ -109,6 +110,20 @@ export class AdController {
 
     return {
       ads,
+      message
+    };
+  }
+
+  @Get('user')
+  async findAllByUser(
+    @Query() {id}: GetAdsUserDto,
+  ): Promise<{userAds: Ad[], message: string}> {
+
+    const userAds = await this.adService.findAllByUser(id)
+    const message = `Liste d'annonces de l'utilisateur`
+
+    return {
+      userAds,
       message
     };
   }
