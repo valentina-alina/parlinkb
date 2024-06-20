@@ -70,28 +70,45 @@ export class AdController {
   }
 
   @Get()
-  async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<Ad[]> {
+  async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<{ads: Ad[], message: string}> {
     const new_options: Prisma.AdFindManyArgs = {}
     options.skip? new_options.skip = +options.skip : null
     options.take? new_options.take = +options.take : null
 
-    return this.adService.findAllByParams(new_options);
+    const ads = await this.adService.findAllByParams(new_options)
+    const message = `Liste d'annonces filtrées`
+
+    return {
+      ads,
+      message
+    };
   }
 
   @Get('params')
   async findAllByFilters(
     @Query() {search}: GetAdsFilterDto,
-  ): Promise<Ad[]> {
+  ): Promise<{ads: Ad[], message: string}> {
 
-    return this.adService.findAllByFilters(search);
+    const ads = await this.adService.findAllByFilters(search)
+    const message = `Liste d'annonces filtrées`
+    return {
+      ads,
+      message
+    };
   }
 
   @Get('categories')
   async findAllByCategories(
     @Query() categoryParams: GetAdsCategoryDto,
-  ): Promise<Ad[]> {
+  ): Promise<{ads: Ad[], message: string}> {
 
-    return this.adService.findAllByCategories(categoryParams);
+    const ads = await this.adService.findAllByCategories(categoryParams)
+    const message = `Liste d'annonces filtrées`
+
+    return {
+      ads,
+      message
+    };
   }
 
   @Get(':id')
