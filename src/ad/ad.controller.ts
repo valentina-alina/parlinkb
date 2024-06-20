@@ -11,9 +11,8 @@ import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
 
 //? ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
 //? ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
-//TODO: ROUTE PAGINATION??
+//? ROUTE PAGINATION??
 //TODO: ROUTE AFFICHER ANNONCE PAR UTILISATEUR [OU DANS USER.CONTROLLER??]
-
 
 //!
 
@@ -71,9 +70,12 @@ export class AdController {
 
   @Get()
   async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<{ads: Ad[], message: string}> {
-    const new_options: Prisma.AdFindManyArgs = {}
-    options.skip? new_options.skip = +options.skip : null
-    options.take? new_options.take = +options.take : null
+    const new_options: Prisma.AdFindManyArgs = {
+      skip: options.skip ? +options.skip: 0,
+      take: options.take ? +options.take: 6,
+    }
+    /* options.skip? new_options.skip = +options.skip : null
+    options.take? new_options.take = +options.take : null */
 
     const ads = await this.adService.findAllByParams(new_options)
     const message = `Liste d'annonces filtrées`
