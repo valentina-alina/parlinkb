@@ -63,6 +63,8 @@ export class AuthController {
 
         // creer nouveau utilisateur
         const new_user = await this.userService.create({...data["user"], password : passwordIni});
+        console.log("🚀 ~ AuthController ~ t new_user id:", new_user.id)
+        
 
          // si subject exite dans data body
             
@@ -74,14 +76,16 @@ subjects.forEach(async sub =>  {
 
     // chercher subject by name
     
-    const subject =  await this.subjectService.findAllByName(sub);
+    const subject =  await this.subjectService.findByUnique({ name : sub});
+      console.log("🚀 ~ AuthController ~  sub:",  sub)
     console.log(subject);
     //TODO const subject = await this.subjectService.findByUnique({ name: sub });
     // faire jointure user id-subject id
     // TODO   const new_user-has-subject = await this.uhpService.create({subject.id,new_user.id});
-  console.log(`Processed subject: ${sub} - ${new_user["id"]} - ${subject["id"]}`);
+  console.log(`Processed subject: ${sub} - ${new_user.id} - ${subject}`);
 //   console.log(subject[0]);
 });
+       
 }
         // si children existe dans data body
         if(data["children"])
@@ -96,7 +100,7 @@ children.forEach(child => {
 
     // faire jointure user id-subject id
     // TODO   const new_user-has-profile = await this.uhpService.create({subject.id,new_user.id});
-  console.log(`Processed child: ${child.firstName} - ${new_user.id}`);
+//   console.log(`Processed child: ${child.firstName} - ${new_user.id}`);
 });
 }
         // for chaque enfant () for n children : 

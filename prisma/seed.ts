@@ -19,6 +19,14 @@ const generateUserAdStatus = (): UserAdStatus => {
     return faker.helpers.arrayElement(statuses) as UserAdStatus;
 };
 
+const generateUniqueNames = (count: number, generator: () => string) => {
+    const names = new Set<string>();
+    while (names.size < count) {
+        names.add(generator());
+    }
+    return Array.from(names);
+};
+
 const generateUsers = (count: number) => {
     const users = [];
     for (let i = 0; i < count; i++) {
@@ -50,29 +58,25 @@ const generateProfiles = (userId: string) => ({
 });
 
 const generateCategories = (count: number) => {
-    const categories = [];
-    for (let i = 0; i < count; i++) {
-        categories.push({
-            id: faker.string.uuid(),
-            name: faker.commerce.department(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
-    }
+    const uniqueNames = generateUniqueNames(count, faker.commerce.department);
+    const categories = uniqueNames.map(name => ({
+        id: faker.string.uuid(),
+        name,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    }));
     return categories;
 };
 
 const generateSubCategories = (categoryIds: string[], count: number) => {
-    const subCategories = [];
-    for (let i = 0; i < count; i++) {
-        subCategories.push({
-            id: faker.string.uuid(),
-            name: faker.commerce.department(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            categoryId: categoryIds[i % categoryIds.length],
-        });
-    }
+    const uniqueNames = generateUniqueNames(count, faker.commerce.department);
+    const subCategories = uniqueNames.map((name, index) => ({
+        id: faker.string.uuid(),
+        name,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        categoryId: categoryIds[index % categoryIds.length],
+    }));
     return subCategories;
 };
 
@@ -144,15 +148,13 @@ const generateMessages = (userId: string, count: number) => {
 };
 
 const generateSubjects = (count: number) => {
-    const subjects = [];
-    for (let i = 0; i < count; i++) {
-        subjects.push({
-            id: faker.string.uuid(),
-            name: faker.lorem.words(2),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
-    }
+    const uniqueNames = generateUniqueNames(count, () => faker.lorem.words(2));
+    const subjects = uniqueNames.map(name => ({
+        id: faker.string.uuid(),
+        name,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    }));
     return subjects;
 };
 

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpStatus, HttpException, Res } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
@@ -46,6 +46,16 @@ export class SubjectController {
       [this.dataName]: out,
       message
     };
+  }
+  @Get('')
+  async findByName(@Query('name') subName: string, @Res() res: Response) {
+    
+
+    const result = await this.service.findByUnique({
+      name : subName
+    });
+
+    return result
   }
 
 
