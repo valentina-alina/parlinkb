@@ -6,12 +6,14 @@ import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { UserService } from '../../src/user/user.service';
 import { AuthGuard } from '../guards/jwt.guards';
+import { GetAdsFilterDto } from './dto/get-ads-filter.dto';
+import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
+import { GetAdsUserDto } from './dto/get-ads-user.dto';
 
-//TODO: ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
-//TODO: ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
-//TODO: ROUTE PAGINATION??
-//TODO: ROUTE AFFICHER ANNONCE PAR UTILISATEUR [OU DANS USER.CONTROLLER??]
-
+//? ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
+//? ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
+//? ROUTE PAGINATION??
+//? ROUTE AFFICHER ANNONCE PAR UTILISATEUR [OU DANS USER.CONTROLLER??]
 
 //!
 
@@ -68,25 +70,75 @@ export class AdController {
   }
 
   @Get()
-  async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<Ad[]> {
-    const new_options: Prisma.AdFindManyArgs = {}
-    options.skip? new_options.skip = +options.skip : null
-    options.take? new_options.take = +options.take : null
+  async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<{ads: Ad[], message: string}> {
+    const new_options: Prisma.AdFindManyArgs = {
+      skip: options.skip ? +options.skip: 0,
+      take: options.take ? +options.take: 6,
+    }
+    /* options.skip? new_options.skip = +options.skip : null
+    options.take? new_options.take = +options.take : null */
 
-    return this.adService.findAllByParams(new_options);
+    const ads = await this.adService.findAllByParams(new_options)
+    const message = `Liste d'annonces filtrées`
+
+    return {
+      ads,
+      message
+    };
+  }
+
+  @Get('params')
+  async findAllByFilters(
+    @Query() {search}: GetAdsFilterDto,
+  ): Promise<{ads: Ad[], message: string}> {
+
+    const ads = await this.adService.findAllByFilters(search)
+    const message = `Liste d'annonces filtrées`
+    return {
+      ads,
+      message
+    };
+  }
+
+  @Get('categories')
+  async findAllByCategories(
+    @Query() categoryParams: GetAdsCategoryDto,
+  ): Promise<{ads: Ad[], message: string}> {
+
+    const ads = await this.adService.findAllByCategories(categoryParams)
+    const message = `Liste d'annonces filtrées`
+
+    return {
+      ads,
+      message
+    };
+  }
+
+  @Get('user')
+  async findAllByUser(
+    @Query() {id}: GetAdsUserDto,
+  ): Promise<{userAds: Ad[], message: string}> {
+
+    const userAds = await this.adService.findAllByUser(id)
+    const message = `Liste d'annonces de l'utilisateur`
+
+    return {
+      userAds,
+      message
+    };
   }
 
   @Get(':id')
   async readRoute(
       @Param('id') id: string,
-  ): Promise<Ad | { message: string }> {
+  ): Promise<{ ad: Ad, message: string}> {
   
     const ad = await this.adService.findByUnique({ id });
 
     if (!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
 
     return {
-      ...ad,
+      ad,
       message: `Annonce avec l'id ${id}`
     };
   }

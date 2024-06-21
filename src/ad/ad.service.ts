@@ -4,6 +4,8 @@ import { Ad, Prisma } from '@prisma/client';
 // import { CreateAdDto } from './dto/create-ad.dto';
 // import { UpdateAdDto } from './dto/update-ad.dto';
 import { PrismaService } from '../../prisma/prisma.service';
+import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
+// import { GetAdsUserDto } from './dto/get-ads-user.dto';
 
 @Injectable()
 export class AdService {
@@ -16,8 +18,60 @@ export class AdService {
     })
   }
 
+  async findAll(): Promise<Ad[]> {
+    return this.prisma.ad.findMany();
+  }
+
   async findAllByParams(options: Prisma.AdFindManyArgs): Promise<Ad[]>{
     return this.prisma.ad.findMany(options);
+  }
+
+  async findAllByFilters(query: string): Promise<Ad[]>{
+    return this.prisma.ad.findMany({
+      where: {
+        OR: [
+          {
+            title: {
+              contains: query
+            }
+          },
+          {
+            city: {
+              contains: query
+            }
+          }
+        ]
+      }
+    })
+  }
+
+  async findAllByCategories({categoryName, subCategoryName} : GetAdsCategoryDto): Promise<Ad[]>{
+    return this.prisma.ad.findMany({
+      where: {
+        OR: [
+          {
+            category: {
+              name: categoryName,
+            },
+          },
+          {
+            subCategory: {
+              name: subCategoryName,
+            },
+          },
+        ],
+      }
+    })
+  }
+
+  async findAllByUser(query: string): Promise<Ad[]>{
+    return this.prisma.ad.findMany({
+      where: {
+        users: {
+          id: query
+        }
+      }
+    })
   }
 
   async findByUnique(
