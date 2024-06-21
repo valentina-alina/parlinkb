@@ -34,7 +34,24 @@ export class UserHasChildService {
       return `Unexpected error: ${error.message}`;
     }
   }
-
+  async deleteByUserId(userId: string): Promise<{ message: string }> {
+    try {
+      await this.prisma.userHasChildren.deleteMany({
+        where: {userId: userId
+        }
+      });
+      let message = 'UserHasChildren records deleted for user ID';
+      return { message: message };
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        const errorMessage = PRISMA_ERRORS[error.code]
+          ? `Prisma error-${error.code}: ${PRISMA_ERRORS[error.code]}`
+          : `Unexpected error: ${error.message}`;
+        return { message: errorMessage };
+      }
+      let message = `Unexpected error: ${error.message}`;
+      return { message: message };
+    }}
   // async findAllByParams(options: Prisma.ChildFindManyArgs): Promise<Child[] | string> {
   //   try {
   //     return await this.prisma.child.findMany(options);

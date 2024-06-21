@@ -6,9 +6,10 @@ import {
     HttpException,
     HttpStatus,
     Post,
-    Req,
+    Req,Delete,
     UnauthorizedException,
-    UseGuards
+    UseGuards,
+    Param
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { UserService } from '../user/user.service';
@@ -108,6 +109,31 @@ export class AuthController {
             messages
         }
     }
+    @Delete('delete/:userId')
+    async deleteByUserId(@Param('userId') userId: string): Promise<{ message: string }> {
+      try {
+        // TODO verif si user has subject existe
+        const userHasSubject = await this.userHasSubjectService.deleteByUserId(userId);
+    } catch (error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }
+      console.log("🚀 ~ AuthController ~ deleteByUserId ~   user has subject")
+      try {
+        const uhcService = await this.uhcService.deleteByUserId(userId);
+    } catch (error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }
+      console.log("🚀 ~ AuthController ~ deleteByUserId ~   user has child")
+      try {
+        const result = await this.userService.deleteByUserId(userId);
+        return result;
+
+      } catch (error) {
+        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      }
+    }
+   
+ 
 
     // //TODO: USER
     // @Post('login')
