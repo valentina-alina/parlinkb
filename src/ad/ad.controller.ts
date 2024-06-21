@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Get, Post, Body, Put,  Param, Delete, Query, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { AdService } from './ad.service';
-import { Ad, Prisma } from '@prisma/client';
+import { Ad, Prisma, UserHasAds } from '@prisma/client';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { UserService } from '../../src/user/user.service';
@@ -14,17 +14,13 @@ import { GetAdsUserDto } from './dto/get-ads-user.dto';
 //? ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
 //? ROUTE PAGINATION??
 //? ROUTE AFFICHER ANNONCE PAR UTILISATEUR [OU DANS USER.CONTROLLER??]
-
-//!
-
-//TODO: USER CREATE SUBSCRIPTION/S
+//? USER CREATE SUBSCRIPTION/S
 //TODO: USER READ ALL SUBSCRIPTIONS
 //TODO: USER READ SUBSCRIPTIONS BY PARAMS --> UPDATE | DELETE [FINDBYPARAMS]
 //TODO: USER READ SUBSCRIPTIONS BY ID --> UPDATE | DELETE [FINDBYUNIQUE]
 //TODO: USER UPDATE SUBSCRIPTIONS
 //TODO: USER DELETE SUBSCRIPTIONS
 
-//!
 
 @Controller('ad')
 export class AdController {
@@ -67,6 +63,26 @@ export class AdController {
       ad: new_ad,
       message
     }
+  }
+
+  @Post(':id/subscribe')
+  async subscribeUserToAd(
+    @Param('id') adId: string,
+    @Body() { userId }: { userId: string },
+  ): Promise<{ subscription: UserHasAds, message: string }> {
+    const user = await this.userService.findByUnique({ id: userId });
+    if (!user) throw new HttpException(`L'utilisateur n'existe pas`, HttpStatus.CONFLICT);
+
+    const ad = await this.adService.findByUnique({ id: adId });
+    if (!ad) throw new HttpException(`L'annonce n'existe pas`, HttpStatus.CONFLICT);
+
+    const subscription = await this.adService.subscribeUserToAd(userId, adId);
+    const message = `L'utilisateur a été inscrit à l'annonce avec succès`;
+
+    return {
+      subscription,
+      message,
+    };
   }
 
   @Get()

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { Ad, Prisma } from '@prisma/client';
+import { Ad, Prisma, UserHasAds } from '@prisma/client';
 // import { CreateAdDto } from './dto/create-ad.dto';
 // import { UpdateAdDto } from './dto/update-ad.dto';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -16,6 +16,17 @@ export class AdService {
     return this.prisma.ad.create({
         data,
     })
+  }
+
+  async subscribeUserToAd(userId: string, adId: string): Promise<UserHasAds> {
+    return this.prisma.userHasAds.create({
+      data: {
+        userId,
+        adId,
+        userAttendees: 1,
+        status: 'true',
+      },
+    });
   }
 
   async findAll(): Promise<Ad[]> {
