@@ -14,6 +14,7 @@ import { MessageModule } from './message/message.module';
 import { AuthModule } from './auth/auth.module';
 import { AppCacheModule } from './cache/cache.module';
 import { ConfigModule } from '@nestjs/config';
+import { UserHasSubjectModule } from './userHasSubject/userHasSubject.module';
 import { SubCategoryModule } from './subCategory/subCategory.module';
 
 @Module({
@@ -33,6 +34,7 @@ import { SubCategoryModule } from './subCategory/subCategory.module';
     MessageModule,
     AppCacheModule,
     SubCategoryModule,
+    UserHasSubjectModule
   ],
   controllers: [AppController],
   providers: [AppService],

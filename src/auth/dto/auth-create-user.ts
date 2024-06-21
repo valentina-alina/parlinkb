@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { IsNotEmpty, IsEmail, IsString, MinLength, MaxLength, IsAlpha } from 'class-validator';
 
-export class CreateUserDto {
+export class AuthCreateUserDto {
     @IsNotEmpty()
     @IsString()
     @ApiProperty({ required: true })
@@ -30,10 +30,7 @@ export class CreateUserDto {
     @ApiProperty({ required: true })
     email: string;
 
-   
-    @IsString()
-    @MinLength(4, { message: 'Le mot de passe doit comporter plus 4 caractères'})
-    @MaxLength(20, { message: 'Le mot de passe doit comporter moins de 20 caractères'})
-    @ApiProperty({ required: true })
+      @ApiProperty({ required: true })
     password: string;
-}
+
+    }
