@@ -30,12 +30,18 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<User[]> {
+  async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<{users: User[], message: string}> {
     const new_options: Prisma.UserFindManyArgs = {}
     options.skip? new_options.skip = +options.skip : null
     options.take? new_options.take = +options.take : null
 
-    return this.userService.findAllByParams(new_options);
+    const users = await this.userService.findAllByParams(new_options);
+    const message = `Liste des utilisateurs`
+
+    return {
+      users,
+      message
+    };
   }
 
   @Post()
