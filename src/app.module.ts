@@ -14,6 +14,7 @@ import { MessageModule } from './message/message.module';
 import { AuthModule } from './auth/auth.module';
 import { AppCacheModule } from './cache/cache.module';
 import { ConfigModule } from '@nestjs/config';
+import { UserHasSubjectModule } from './userHasSubject/userHasSubject.module';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { ConfigModule } from '@nestjs/config';
     SubjectModule,
     UserGroupModule,
     MessageModule,
-    AppCacheModule,
+    AppCacheModule,UserHasSubjectModule
   ],
   controllers: [AppController],
   providers: [AppService],

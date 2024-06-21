@@ -12,13 +12,10 @@ export class ChildController {
   constructor(private readonly service: ChildService) {}
 
   @Post()
-  async create(@Body() inputDto: CreateChildDto): Promise<{ [key: string]: Child | string }> {
+  async create(@Body() inputDto: CreateChildDto): Promise<{child?:Child , message:string}> {
     const out = await this.service.create(inputDto);
     const message = 'New child was created';
-    return {
-      [this.dataName]: out,
-      message,
-    };
+    return out;
   }
 
 
@@ -35,6 +32,18 @@ export class ChildController {
       message
     };
   }
+  @Get('one')
+  async findAllByfilter(@Body() element: CreateChildDto): Promise<{ [key: string]: Child[] | string }> {
+
+  console.log("🚀 ~ ChildController ~ findAllByfilter ~ element:", element)
+    const out = await this.service.findAllByFilters(element);
+    const message = `All childs`;
+    return {
+      [this.dataName]: out,
+      message
+    };
+  }
+  
 
   @Get(':id')
   async readRoute(@Param('id') id: string): Promise<{ [key: string]: Child | string }> {

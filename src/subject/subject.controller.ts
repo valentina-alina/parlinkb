@@ -51,8 +51,7 @@ export class SubjectController {
   async findByName(@Query('name') subName: string, @Res() res: Response) {
     
 
-    const result = await this.service.findByUnique({
-      name : subName
+    const result = await this.service.findByUnique({name: subName
     });
 
     return result

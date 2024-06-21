@@ -65,7 +65,7 @@ export class SubjectService {
     }
   }
 
-  async findByUnique(WhereUniqueInput: Prisma.SubjectWhereUniqueInput): Promise<Subject | string> {
+  async findByUnique(WhereUniqueInput: Prisma.SubjectWhereUniqueInput): Promise<Subject | string | null > {
     try {
       const subject = await this.prisma.subject.findUnique({
         where: WhereUniqueInput,

@@ -17,21 +17,27 @@ export class ChildService {
   
   ) {}
 // inputDto doit avoir la meme structure que  Child de Promise sinon ça ne marche pas
-  async create(inputDto: CreateChildDto): Promise<Child | string> {
+  async create(inputDto: CreateChildDto): Promise<{child?:Child , message:string}> {
     try {
       const out = await this.prisma.child.create({ 
         data: inputDto
       });
-      return out;
+      let message ='Un enfant a été crée';
+      return { child : out, message : message};
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         const errorMessage = PRISMA_ERRORS[error.code]
           ? `Prisma error-${error.code}: ${PRISMA_ERRORS[error.code]}`
           : `Unexpected error: ${error.message}`;
-        return errorMessage;
+       
+
+       return { message :  errorMessage};
       }
-      return `Unexpected error: ${error.message}`;
+     
+       let message = `Unexpected error: ${error.message}`;
+       return { message :  message};
     }
+   
   }
 
   async findAllByParams(options: Prisma.ChildFindManyArgs): Promise<Child[] | string> {
@@ -46,6 +52,29 @@ export class ChildService {
     }
   }
 
+  async findAllByFilters(data: CreateChildDto): Promise<Child[]>{
+    return this.prisma.child.findMany({
+      where: {
+        AND: [
+          {
+            firstName: {contains : data.firstName}
+            }
+          ,
+          {
+            lastName:  {contains : data.lastName}
+            }
+          ,
+          {
+           class:  {contains : data.class}
+            }
+          ,
+          {
+            school:  {contains : data.school}
+           }
+        ]
+      }
+    })
+  } 
   async findByUnique(whereUniqueInput: Prisma.ChildWhereUniqueInput): Promise<Child | string> {
     try {
       const out= await this.prisma.child.findUnique({
