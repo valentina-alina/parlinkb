@@ -33,6 +33,8 @@ import { SubCategoryModule } from './subCategory/subCategory.module';
     UserGroupModule,
     MessageModule,
     AppCacheModule,
+    SubCategoryModule,
+    UserHasSubjectModule
   ],
   controllers: [AppController],
   providers: [AppService],

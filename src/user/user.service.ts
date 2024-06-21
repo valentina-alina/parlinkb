@@ -2,10 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Prisma, User } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service'
 import { PrismaService } from '../../prisma/prisma.service';
-import { CacheService } from '../cache/cache.service';
-import { da } from '@faker-js/faker';
 import { PRISMA_ERRORS } from '../../prisma/prisma.errors';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
@@ -15,13 +12,14 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateUserDto): Promise<User> {
-    return this.prisma.user.create({
+    /* return this.prisma.user.create({
       data,
-    })
+    }) */
+
     const user = await this.prisma.user.create(
       {data: {role : data.role, firstName : data.firstName, lastName: data.lastName, email :data.email, password:data.password}}
     );
-    await this.cacheService.set(`user:${user.id}`, user, this.CACHE_TTL);
+
     return user;
   }
 
@@ -79,10 +77,6 @@ export class UserService {
     return this.prisma.user.delete({
       where,
     })
-  };
-    });
-    await this.cacheService.del(`user:${user.id}`);
-    return user;
   }
   
   async deleteByUserId(userId: string): Promise<{ message: string }> {
@@ -91,7 +85,7 @@ export class UserService {
         where: { id: userId
         }
       });
-      let message = 'UserHasSubject records deleted for user ID';
+      const message = 'UserHasSubject records deleted for user ID';
       return { message: message };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -100,7 +94,7 @@ export class UserService {
           : `Unexpected error: ${error.message}`;
         return { message: errorMessage };
       }
-      let message = `Unexpected error: ${error.message}`;
+      const message = `Unexpected error: ${error.message}`;
       return { message: message };
     }}
  
