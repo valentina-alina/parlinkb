@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Get, Post, Body, Put,  Param, Delete, Query, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { AdService } from './ad.service';
-import { Ad, Prisma } from '@prisma/client';
+import { Ad, Prisma, UserHasAds } from '@prisma/client';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { UserService } from '../../src/user/user.service';
@@ -14,17 +14,13 @@ import { GetAdsUserDto } from './dto/get-ads-user.dto';
 //? ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
 //? ROUTE PAGINATION??
 //? ROUTE AFFICHER ANNONCE PAR UTILISATEUR [OU DANS USER.CONTROLLER??]
+//? USER CREATE SUBSCRIPTION/S
+//? USER READ ALL SUBSCRIPTIONS
+//? USER READ SUBSCRIPTIONS BY PARAMS --> UPDATE | DELETE [FINDBYPARAMS]
+//? USER READ SUBSCRIPTIONS BY ID --> UPDATE | DELETE [FINDBYUNIQUE]
+//? USER UPDATE SUBSCRIPTIONS
+//? USER DELETE SUBSCRIPTIONS
 
-//!
-
-//TODO: USER CREATE SUBSCRIPTION/S
-//TODO: USER READ ALL SUBSCRIPTIONS
-//TODO: USER READ SUBSCRIPTIONS BY PARAMS --> UPDATE | DELETE [FINDBYPARAMS]
-//TODO: USER READ SUBSCRIPTIONS BY ID --> UPDATE | DELETE [FINDBYUNIQUE]
-//TODO: USER UPDATE SUBSCRIPTIONS
-//TODO: USER DELETE SUBSCRIPTIONS
-
-//!
 
 @Controller('ad')
 export class AdController {
@@ -36,8 +32,6 @@ export class AdController {
   @Post()
   @UseGuards(AuthGuard)
   async create(@Body() data: CreateAdDto): Promise<{ ad: Ad, message: string}> {
-
-    // vérifier si l'utilisateur existe
     const user = await this.userService.findByUnique({id : data.userId})
       if (!user) throw new HttpException(`L'utilisateur n'existe pas`, HttpStatus.CONFLICT)
 
@@ -173,4 +167,66 @@ export class AdController {
 
     return { message: `L'annonce avec l'id ${id} a bien été supprimée` }
   }
+
+  @Post(':id/subscribe')
+  async subscribeUserToAd(
+    @Param('id') adId: string,
+    @Body() { userId }: { userId: string },
+  ): Promise<{ subscription: UserHasAds, message: string }> {
+
+    const user = await this.userService.findByUnique({ id: userId });
+    if (!user) throw new HttpException(`L'utilisateur n'existe pas`, HttpStatus.CONFLICT);
+
+    const ad = await this.adService.findByUnique({ id: adId });
+    if (!ad) throw new HttpException(`L'annonce n'existe pas`, HttpStatus.CONFLICT);
+
+    const subscription = await this.adService.subscribeUserToAd(userId, adId);
+    const message = `L'utilisateur a été inscrit à l'annonce avec succès`;
+
+    return {
+      subscription,
+      message,
+    };
+  }
+
+  @Get(':userId/subscriptions')
+  async getSubscriptionsByUserId(@Param('userId') userId: string): Promise<{ subscriptions: UserHasAds[], message: string }> {
+
+    const subscriptions = await this.adService.getAllSubscriptionsByUserId(userId);
+    const message = `Liste des inscriptions de l'utilisateur avec l'id ${userId}`;
+    return { subscriptions, message };
+  }
+
+  @Get(':userId/subscriptions/params')
+  async getSubscriptionsByUserParams(
+    @Param('userId') userId: string,
+    @Query() params: { title?: string, city?: string }
+  ): Promise<{ subscriptions: UserHasAds[], message: string }> {
+
+    const subscriptions = await this.adService.getAllSubscriptionsByUserParams(userId, params);
+    const message = `List des annonces de l'utilisateur avec l'id ${userId} filtrées`;
+    return { subscriptions, message };
+  }
+
+  @Put(':userId/subscriptions/:adId')
+  async updateUserAdSubscription(
+    @Param('userId') userId: string,
+    @Param('adId') adId: string,
+    @Body() updateData: Prisma.UserHasAdsUpdateInput
+  ): Promise<{ subscription: UserHasAds, message: string }> {
+
+    const subscription = await this.adService.updateUserAdSubscription(userId, adId, updateData);
+    const message = `Inscription avec l'id ${adId} pour l'utilisateur avec l'id ${userId} mise à jour correctement`;
+    return { subscription, message };
+  }
+
+  @Delete(':userId/subscriptions/:adId')
+async deleteUserAdSubscription(
+  @Param('userId') userId: string,
+  @Param('adId') adId: string
+): Promise<{ message: string }> {
+  await this.adService.deleteUserAdSubscription(userId, adId);
+  const message = `L'inscription à l'annonce ${adId} pour l'utilisateur avec l'id ${userId} a été supprimée`;
+  return { message };
+}
 }
