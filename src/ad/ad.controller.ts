@@ -197,6 +197,17 @@ export class AdController {
     return { subscriptions, message };
   }
 
+  @Get(':userId/subscriptions/params')
+  async getSubscriptionsByUserParams(
+    @Param('userId') userId: string,
+    @Query() params: { title?: string, city?: string }
+  ): Promise<{ subscriptions: UserHasAds[], message: string }> {
+
+    const subscriptions = await this.adService.getAllSubscriptionsByUserParams(userId, params);
+    const message = `List des annonces de l'utilisateur avec l'id ${userId} filtrées`;
+    return { subscriptions, message };
+  }
+
   @Put(':userId/subscriptions/:adId')
   async updateUserAdSubscription(
     @Param('userId') userId: string,
