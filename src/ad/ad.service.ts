@@ -18,17 +18,6 @@ export class AdService {
     })
   }
 
-  async subscribeUserToAd(userId: string, adId: string): Promise<UserHasAds> {
-    return this.prisma.userHasAds.create({
-      data: {
-        userId,
-        adId,
-        userAttendees: 1,
-        status: 'true',
-      },
-    });
-  }
-
   async findAll(): Promise<Ad[]> {
     return this.prisma.ad.findMany();
   }
@@ -107,5 +96,69 @@ export class AdService {
     return this.prisma.ad.delete({
         where
     })
-  };
+  }
+
+  async subscribeUserToAd(userId: string, adId: string): Promise<UserHasAds> {
+    return this.prisma.userHasAds.create({
+      data: {
+        userId,
+        adId,
+        userAttendees: 1,
+        status: 'true',
+      },
+    });
+  }
+
+  async getAllSubscriptionsByUserId(userId: string): Promise<UserHasAds[]> {
+    return this.prisma.userHasAds.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        ads: true,
+      },
+    });
+  }
+
+  async getAllSubscriptionsByUserParams(userId: string, params: { title?: string, city?: string }): Promise<UserHasAds[]> {
+    return this.prisma.userHasAds.findMany({
+      where: {
+        userId: userId,
+        ads: {
+          OR: [
+            { title:
+              {
+                contains: params.title
+              }
+            },
+            { city:
+              {
+                contains: params.city
+              }
+            },
+          ],
+        },
+      },
+      include: {
+        ads: true,
+      },
+    });
+  }
+
+  async updateUserAdSubscription(userId: string, adId: string, data: Prisma.UserHasAdsUpdateInput): Promise<UserHasAds> {
+    return this.prisma.userHasAds.update({
+      where: {
+        userId_adId: { userId, adId },
+      },
+      data,
+    });
+  }
+
+  async deleteUserAdSubscription(userId: string, adId: string): Promise<UserHasAds> {
+    return this.prisma.userHasAds.delete({
+      where: {
+        userId_adId: { userId, adId },
+      },
+    });
+  }
 }
