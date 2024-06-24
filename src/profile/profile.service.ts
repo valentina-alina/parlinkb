@@ -2,28 +2,54 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { Prisma, Profile } from '@prisma/client';
+import { PrismaService } from'../../prisma/prisma.service';
+import { IsPostalCode } from 'class-validator';
 
 //TODO: UTILISATION DE AUTH.SERVICE ??
 
 @Injectable()
 export class ProfileService {
-  create(createProfileDto: CreateProfileDto) {
-    return 'This action adds a new profile';
+
+  constructor(
+    private readonly prisma: PrismaService,
+    
+  ) {} 
+
+  async findAllByParams(options: Prisma.ProfileFindManyArgs): Promise<Profile[]>{
+    return this.prisma.profile.findMany(options);
   }
 
-  findAll() {
-    return `This action returns all profile`;
+
+  async create(data: Prisma.ProfileCreateInput): Promise<Profile> {
+    return  this.prisma.profile.create({  data });
+     
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
+ 
+  async findByUnique(
+    profileWhereUniqueInput: Prisma.ProfileWhereUniqueInput
+  ): Promise<Profile | null> {
+    return this.prisma.profile.findUnique({
+      where: profileWhereUniqueInput
+    });
   }
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
+  
+
+  async update(
+      where: Prisma.ProfileWhereUniqueInput,
+      data: Prisma.ProfileUpdateInput
+    ): Promise<Profile> {
+      return this.prisma.profile.update({
+        where,
+        data,
+      });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} profile`;
-  }
+  async delete(where: Prisma.ProfileWhereUniqueInput): Promise<Profile> {
+    return this.prisma.profile.delete({
+      where,
+    })
+  };
 }
