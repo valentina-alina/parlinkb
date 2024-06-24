@@ -17,13 +17,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
 import { CustomException } from '../exceptions/custom.exception';
 
-//TODO: READ USER BY ID
-//TODO: READ ALL USERS
+
+//TODO: READ USER BY ID 
+//TODO: READ ALL USERS 
 
 //TODO: USER PASSWORD UPDATE
 //TODO: USER PROFILE UPDATE
+//TODO: USER UPDATE
 
-//TODO: READ USER BY CURRENT USER ID
 
 @Controller('user')
 export class UserController {
