@@ -4,6 +4,8 @@ import { IsNotEmpty, IsString, MinLength, MaxLength, IsAlpha, Matches } from 'cl
 
 export class CreateProfileDto {
 
+
+
     @IsNotEmpty()
     @IsString()
     @Matches(/^0\d{9}$/)
@@ -41,4 +43,15 @@ export class CreateProfileDto {
     @IsAlpha()
     @ApiProperty({ required: true })
     profilePicture: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({ required: true })
+    userId: string;
+
+    
+    // @IsNotEmpty()
+    // @IsString()
+    // @ApiProperty({ required: true })
+    // user: string;
 }
