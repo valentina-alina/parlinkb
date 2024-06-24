@@ -12,14 +12,11 @@ export interface Response<T> {
 @Injectable()
 export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-        console.log('coucou');
-        //const now = Date.now();
         return next.handle().pipe(
             map(
                 (data: T & {message: string}) => {
-                    const message = data.message;
-                    console.log('message', message)
-                    return {data, message, date: new Date()}
+                    const { message, ...rest } = data;
+                    return { data: rest, message, date: new Date() };
                 }
             )
         );

@@ -1,21 +1,17 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, /* Post, Body, Patch, */ Param, Delete, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put,  Param, Delete, Query, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { AdService } from './ad.service';
 import { Ad, Prisma } from '@prisma/client';
-// import { CreateAdDto } from './dto/create-ad.dto';
-// import { UpdateAdDto } from './dto/update-ad.dto';
+import { CreateAdDto } from './dto/create-ad.dto';
+import { UpdateAdDto } from './dto/update-ad.dto';
+import { UserService } from '../../src/user/user.service';
+import { AuthGuard } from '../guards/jwt.guards';
 
 //TODO: ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
 //TODO: ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
 //TODO: ROUTE PAGINATION??
 //TODO: ROUTE AFFICHER ANNONCE PAR UTILISATEUR [OU DANS USER.CONTROLLER??]
 
-//TODO: USER CREATE AD
-//TODO: USER READ ALL ADS
-//TODO: USER READ ADS BY PARAMS
-//TODO: USER READ AD BY ID
-//TODO: USER UPDATE AD
-//TODO: USER DELETE SELF PUBLISHED AD/S
 
 //!
 
@@ -30,12 +26,46 @@ import { Ad, Prisma } from '@prisma/client';
 
 @Controller('ad')
 export class AdController {
-  constructor(private readonly adService: AdService) {}
+  constructor(
+    private readonly adService: AdService,
+    private readonly userService: UserService,
+  ) {}
 
-/*   @Post()
-  create(@Body() createAdDto: CreateAdDto) {
-    return this.adService.create(createAdDto);
-  } */
+  @Post()
+  @UseGuards(AuthGuard)
+  async create(@Body() data: CreateAdDto): Promise<{ ad: Ad, message: string}> {
+
+    // vérifier si l'utilisateur existe
+    const user = await this.userService.findByUnique({id : data.userId})
+      if (!user) throw new HttpException(`L'utilisateur n'existe pas`, HttpStatus.CONFLICT)
+
+    const new_ad =  await this.adService.create({
+      title: data.title,
+      description: data.description,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      duration: data.duration,
+      address: data.address,
+      postalCode: data.postalCode,
+      city: data.city,
+      country: data.country,
+      attendees: data.attendees,
+      transport: data.transport,
+      conform: data.conform,
+      status: data.status,
+      adPicture: data.adPicture,
+      users: { connect: { id: data.userId } },
+      category: { connect: { id: data.categoryId } },
+      subCategory: { connect: { id: data.subCategoryId } },
+    });
+
+    const message = `L'annonce a bien été créée`
+
+    return {
+      ad: new_ad,
+      message
+    }
+  }
 
   @Get()
   async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<Ad[]> {
@@ -53,7 +83,7 @@ export class AdController {
   
     const ad = await this.adService.findByUnique({ id });
 
-    if (!ad) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
+    if (!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
 
     return {
       ...ad,
@@ -61,13 +91,34 @@ export class AdController {
     };
   }
 
-/*   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdDto: UpdateAdDto) {
-    return this.adService.update(+id, updateAdDto);
-  } */
+  @Put(':id')
+  async updateRoute(
+      @Param('id') id: string,
+      @Body() adUpdateDto: UpdateAdDto,
+  ): Promise<{ad: Ad, message: string}> {
+      const ad = await this.adService.findByUnique({ id });
+      
+      if (!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
+
+      const adUpdate = await this.adService.update({ id }, adUpdateDto);
+
+      const message = `L'annonce avec l'id ${id} a bien été mise à jour`;
+
+      return {
+        ad: adUpdate,
+        message
+      }
+  }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adService.remove(+id);
+  async deleteRoute(@Param('id') id: string,): Promise<Ad | { message: string }> {
+
+    const ad = await this.adService.findByUnique({ id })
+
+    if(!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
+
+    this.adService.delete({ id });
+
+    return { message: `L'annonce avec l'id ${id} a bien été supprimée` }
   }
 }

@@ -42,7 +42,7 @@ export class UserController {
   @Post()
     async create(
       @Param('id') id: string,
-      @Body() data: CreateUserDto): Promise<any> {
+      @Body() data: CreateUserDto): Promise<{ user: User, message: string}> {
         const user = await this.userService.findByUnique({email: data.email
         });
 
@@ -50,31 +50,36 @@ export class UserController {
         const new_user =  await this.userService.create(data);
         delete new_user.password
 
+        const message = `Utilisateur créé`;
+
         return {
           user: new_user,
-          date: new Date(),
-          message: 'Utilisateur créé'
+          message
         }
   }
 
   @Get(':id')
   async readRoute(
       @Param('id') id: string,
-  ): Promise<User> {
+  ): Promise<{user: User, message: string}> {
   
     const user = await this.userService.findByUnique({ id });
 
     if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
-
-    return user;
+    
+    const message = `Utilisateur avec l\'id ${id}`;
+    return {
+      user,
+      message
+    };
   }
 
   @Put(':id')
   async updateRoute(
       @Param('id') id: string,
       @Body() userUpdateDto: UpdateUserDto,
-  ): Promise<User | { message: string }> {
-      const user = this.userService.findByUnique({ id });
+  ): Promise<{user: User, message: string}> {
+      const user = await this.userService.findByUnique({ id });
       
       if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
 
@@ -86,17 +91,25 @@ export class UserController {
 
       const userUpdate = await this.userService.update({ id }, userUpdateDto);
 
+      delete userUpdate.password;
+
+      const message = `L'utilisateur avec l'id ${id} a bien été mis à jour`;
+
       return {
-          ...userUpdate,
-          message: `L'utilisateur avec l'id ${id} a bien été mis à jour`
-        }
+        user: userUpdate,
+        message
+      }
   }
 
   @Delete(':id')
     async deleteRoute(@Param('id') id: string,): Promise<User | { message: string }> {
+
         const user = await this.userService.findByUnique({ id })
+
         if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
+
         this.userService.delete({id });
+
         return { message: `L'utilisateur avec l'id ${ id } a bien été supprimé` }
     }
 }

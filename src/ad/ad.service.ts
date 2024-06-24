@@ -5,18 +5,16 @@ import { Ad, Prisma } from '@prisma/client';
 // import { UpdateAdDto } from './dto/update-ad.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 
-//TODO:
 @Injectable()
 export class AdService {
 
   constructor(private prisma: PrismaService) {}
 
-  /* async create(data: CreateAdDto): Promise<Ad> {
+  async create(data: Prisma.AdCreateInput): Promise<Ad> {
     return this.prisma.ad.create({
         data,
     })
   }
- */
 
 
   async findAllByParams(options: Prisma.AdFindManyArgs): Promise<Ad[]>{
@@ -31,11 +29,19 @@ export class AdService {
     });
   }
 
-  /* async update(id: number, updateAdDto: UpdateAdDto) {
-    return `This action updates a #${id} ad`;
-  } */
-
-  async remove(id: number) {
-    return `This action removes a #${id} ad`;
+  async update(
+    where: Prisma.AdWhereUniqueInput,
+    data: Prisma.AdUpdateInput
+  ): Promise<Ad> {
+    return this.prisma.ad.update({
+      where,
+      data,
+    });
   }
+
+  async delete(where: Prisma.AdWhereUniqueInput): Promise<Ad> {
+    return this.prisma.ad.delete({
+        where
+    })
+  };
 }
