@@ -55,11 +55,9 @@ export class AdController {
       subCategory: { connect: { id: data.subCategoryId } },
     });
 
-    const message = `L'annonce a bien été créée`
-
     return {
       ad: new_ad,
-      message
+      message: `L'annonce a bien été créée`
     }
   }
 
@@ -73,11 +71,10 @@ export class AdController {
     options.take? new_options.take = +options.take : null */
 
     const ads = await this.adService.findAllByParams(new_options)
-    const message = `Liste d'annonces filtrées`
 
     return {
       ads,
-      message
+      message: `Liste d'annonces filtrées`
     };
   }
 
@@ -87,10 +84,10 @@ export class AdController {
   ): Promise<{ads: Ad[], message: string}> {
 
     const ads = await this.adService.findAllByFilters(search)
-    const message = `Liste d'annonces filtrées`
+
     return {
       ads,
-      message
+      message: `Liste d'annonces filtrées`
     };
   }
 
@@ -100,11 +97,10 @@ export class AdController {
   ): Promise<{ads: Ad[], message: string}> {
 
     const ads = await this.adService.findAllByCategories(categoryParams)
-    const message = `Liste d'annonces filtrées`
 
     return {
       ads,
-      message
+      message: `Liste d'annonces filtrées`
     };
   }
 
@@ -114,11 +110,10 @@ export class AdController {
   ): Promise<{userAds: Ad[], message: string}> {
 
     const userAds = await this.adService.findAllByUser(id)
-    const message = `Liste d'annonces de l'utilisateur`
 
     return {
       userAds,
-      message
+      message: `Liste d'annonces de l'utilisateur`
     };
   }
 
@@ -148,11 +143,9 @@ export class AdController {
 
       const adUpdate = await this.adService.update({ id }, adUpdateDto);
 
-      const message = `L'annonce avec l'id ${id} a bien été mise à jour`;
-
       return {
         ad: adUpdate,
-        message
+        message: `L'annonce avec l'id ${id} a bien été mise à jour`
       }
   }
 
@@ -165,7 +158,9 @@ export class AdController {
 
     this.adService.delete({ id });
 
-    return { message: `L'annonce avec l'id ${id} a bien été supprimée` }
+    return {
+      message: `L'annonce avec l'id ${id} a bien été supprimée`
+    }
   }
 
   @Post(':id/subscribe')
@@ -181,11 +176,10 @@ export class AdController {
     if (!ad) throw new HttpException(`L'annonce n'existe pas`, HttpStatus.CONFLICT);
 
     const subscription = await this.adService.subscribeUserToAd(userId, adId);
-    const message = `L'utilisateur a été inscrit à l'annonce avec succès`;
 
     return {
       subscription,
-      message,
+      message: `L'utilisateur a été inscrit à l'annonce avec succès`
     };
   }
 
@@ -193,8 +187,11 @@ export class AdController {
   async getSubscriptionsByUserId(@Param('userId') userId: string): Promise<{ subscriptions: UserHasAds[], message: string }> {
 
     const subscriptions = await this.adService.getAllSubscriptionsByUserId(userId);
-    const message = `Liste des inscriptions de l'utilisateur avec l'id ${userId}`;
-    return { subscriptions, message };
+
+    return {
+      subscriptions,
+      message: `Liste des inscriptions de l'utilisateur avec l'id ${userId}`
+    };
   }
 
   @Get(':userId/subscriptions/params')
@@ -204,8 +201,10 @@ export class AdController {
   ): Promise<{ subscriptions: UserHasAds[], message: string }> {
 
     const subscriptions = await this.adService.getAllSubscriptionsByUserParams(userId, params);
-    const message = `List des annonces de l'utilisateur avec l'id ${userId} filtrées`;
-    return { subscriptions, message };
+    return {
+      subscriptions,
+      message: `List des annonces de l'utilisateur avec l'id ${userId} filtrées`
+    };
   }
 
   @Put(':userId/subscriptions/:adId')
@@ -216,17 +215,22 @@ export class AdController {
   ): Promise<{ subscription: UserHasAds, message: string }> {
 
     const subscription = await this.adService.updateUserAdSubscription(userId, adId, updateData);
-    const message = `Inscription avec l'id ${adId} pour l'utilisateur avec l'id ${userId} mise à jour correctement`;
-    return { subscription, message };
+
+    return {
+      subscription,
+      message: `Inscription avec l'id ${adId} pour l'utilisateur avec l'id ${userId} mise à jour correctement`
+    };
   }
 
   @Delete(':userId/subscriptions/:adId')
-async deleteUserAdSubscription(
-  @Param('userId') userId: string,
-  @Param('adId') adId: string
-): Promise<{ message: string }> {
-  await this.adService.deleteUserAdSubscription(userId, adId);
-  const message = `L'inscription à l'annonce ${adId} pour l'utilisateur avec l'id ${userId} a été supprimée`;
-  return { message };
-}
+  async deleteUserAdSubscription(
+    @Param('userId') userId: string,
+    @Param('adId') adId: string
+  ): Promise<{ message: string }> {
+    await this.adService.deleteUserAdSubscription(userId, adId);
+    
+    return {
+      message: `L'inscription à l'annonce ${adId} pour l'utilisateur avec l'id ${userId} a été supprimée`
+    };
+  }
 }
