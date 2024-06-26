@@ -10,12 +10,20 @@ import { HttpExceptionFilter } from './filters/http-exception.filters';
 import { CustomHttpExceptionFilter } from './filters/custom-exception.filters';
 import { LoggingInterceptor } from './interceptors/logging.interceptors';
 import { TransformInterceptor } from './interceptors/transform.interceptors';
+import * as cors from 'cors';
 
 async function bootstrap() {
   console.log('Application NestJS en cours de démarrage...');
 
   const app = await NestFactory.create(AppModule);
   console.log('Application NestJS créée.');
+
+  app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }));
+  console.log('CORS configuré')
 
   app.useGlobalPipes(new ValidationPipe());
   console.log('Global validation pipe configuré.');
