@@ -27,6 +27,8 @@ const generateUniqueNames = (count: number, generator: () => string) => {
     return Array.from(names);
 };
 
+const categoryNames = ['Covoiturage', 'Soutien', 'Garderie', 'Sortie'];
+
 const generateUsers = (count: number) => {
     const users = [];
     for (let i = 0; i < count; i++) {
@@ -57,15 +59,29 @@ const generateProfiles = (userId: string) => ({
     userId,
 });
 
-const generateCategories = (count: number) => {
-    const uniqueNames = generateUniqueNames(count, faker.commerce.department);
-    const categories = uniqueNames.map(name => ({
-        id: faker.string.uuid(),
-        name,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    }));
-    return categories;
+const generateCategories = async () => {
+    const categoryMap = new Map<string, string>();
+
+    for (const name of categoryNames) {
+        const existingCategory = await prisma.category.findUnique({
+            where: { name },
+        });
+        if (!existingCategory) {
+            const createdCategory = await prisma.category.create({
+                data: {
+                    id: faker.string.uuid(),
+                    name,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            });
+            categoryMap.set(name, createdCategory.id);
+        } else {
+            categoryMap.set(name, existingCategory.id);
+        }
+    }
+
+    return categoryNames.map(name => categoryMap.get(name)!);
 };
 
 const generateSubCategories = (categoryIds: string[], count: number) => {
@@ -98,6 +114,8 @@ const generateAds = async (userId: string, categoryIds: string[], subCategoryIds
                     city: faker.location.city(),
                     country: faker.location.country().slice(0, 20),
                     attendees: faker.number.int({ min: 0, max: 100 }),
+                    lat: faker.location.latitude().toString(),
+                    lng: faker.location.longitude().toString(),
                     transport: faker.helpers.arrayElement(['car', 'van']) as Transport,
                     conform: faker.datatype.boolean(),
                     status: faker.helpers.arrayElement(['cancel', 'report']) as AdStatus,
@@ -221,63 +239,59 @@ const generateAdHasFiles = (adId: string, fileIds: string[]) => {
 };
 
 const seed = async () => {
-    const categories = generateCategories(5);
-    const createdCategories = await Promise.all(categories.map(category => prisma.category.create({ data: category })));
-    const categoryIds = createdCategories.map(category => category.id);
+    try {
+        console.log('En cours de génération...');
+        const categoryIds = await generateCategories();
 
-    // Ensure unique categoryIds for subcategories
-    const subCategories = generateSubCategories(categoryIds, 5);
-    const subCategoryData = subCategories.map(subCategory => ({
-        ...subCategory,
-        categoryId: categoryIds[subCategories.indexOf(subCategory) % categoryIds.length]
-    }));
-    const createdSubCategories = await Promise.all(subCategoryData.map(subCategory => prisma.subCategory.create({ data: subCategory })));
-    const subCategoryIds = createdSubCategories.map(subCategory => subCategory.id);
-    
-    const subjects = generateSubjects(5);
-    const createdSubjects = await Promise.all(subjects.map(subject => prisma.subject.create({ data: subject })));
+        // Generate subcategories for these fixed categories
+        const subCategories = generateSubCategories(categoryIds, 5);
+        const createdSubCategories = await Promise.all(subCategories.map(subCategory => prisma.subCategory.create({ data: subCategory })));
+        const subCategoryIds = createdSubCategories.map(subCategory => subCategory.id);
 
-    const children = generateChildren(5);
-    const createdChildren = await Promise.all(children.map(child => prisma.child.create({ data: child })));
+        // Generate subjects, children, users, profiles, and associations
+        const subjects = generateSubjects(5);
+        const createdSubjects = await Promise.all(subjects.map(subject => prisma.subject.create({ data: subject })));
 
-    const users = generateUsers(10);
-    for (const user of users) {
-        const createdUser = await prisma.user.create({ data: user });
+        const children = generateChildren(5);
+        const createdChildren = await Promise.all(children.map(child => prisma.child.create({ data: child })));
 
-        const profile = generateProfiles(createdUser.id);
-        await prisma.profile.create({ data: profile });
+        const users = generateUsers(10);
+        for (const user of users) {
+            const createdUser = await prisma.user.create({ data: user });
 
-        const ads = await generateAds(createdUser.id, categoryIds, subCategoryIds, 3);
-        const adIds = ads.map(ad => ad.id);
+            const profile = generateProfiles(createdUser.id);
+            await prisma.profile.create({ data: profile });
 
-        for (const ad of ads) {
-            const files = generateFiles(createdUser.id, 2);
-            const createdFiles = await Promise.all(files.map(file => prisma.file.create({ data: file })));
+            const ads = await generateAds(createdUser.id, categoryIds, subCategoryIds, 3);
+            const adIds = ads.map(ad => ad.id);
 
-            const adHasFiles = generateAdHasFiles(ad.id, createdFiles.map(file => file.id));
-            await Promise.all(adHasFiles.map(adHasFile => prisma.adHasFile.create({ data: adHasFile })));
-        }
+            for (const ad of ads) {
+                const files = generateFiles(createdUser.id, 2);
+                const createdFiles = await Promise.all(files.map(file => prisma.file.create({ data: file })));
 
-        const messages = generateMessages(createdUser.id, 3);
-        for (const message of messages) {
-            await prisma.message.create({ data: message });
-        }
+                const adHasFiles = generateAdHasFiles(ad.id, createdFiles.map(file => file.id));
+                await Promise.all(adHasFiles.map(adHasFile => prisma.adHasFile.create({ data: adHasFile })));
+            }
 
-        const userChildren = createdChildren.map(child => ({
-            userId: createdUser.id,
-            childId: child.id,
-        }));
-        await prisma.userHasChildren.createMany({ data: userChildren });
+            const messages = generateMessages(createdUser.id, 3);
+            for (const message of messages) {
+                await prisma.message.create({ data: message });
+            }
 
-        const userHasSubjects = generateUserHasSubjects(createdUser.id, createdSubjects.map(subject => subject.id));
-        await prisma.userHasSubjects.createMany({ data: userHasSubjects });
+            const userChildren = createdChildren.map(child => ({
+                userId: createdUser.id,
+                childId: child.id,
+            }));
+            await prisma.userHasChildren.createMany({ data: userChildren });
 
-        const userHasAds = generateUserHasAds(createdUser.id, adIds);
-        await prisma.userHasAds.createMany({ data: userHasAds });
+            const userHasSubjects = generateUserHasSubjects(createdUser.id, createdSubjects.map(subject => subject.id));
+            await prisma.userHasSubjects.createMany({ data: userHasSubjects });
 
-        const userHasChildren = generateUserHasChildren(createdUser.id, createdChildren.map(child => child.id));
-        
-        try {
+            const userHasAds = generateUserHasAds(createdUser.id, adIds);
+            await prisma.userHasAds.createMany({ data: userHasAds });
+
+            const userHasChildren = generateUserHasChildren(createdUser.id, createdChildren.map(child => child.id));
+
             for (const relation of userHasChildren) {
                 await prisma.userHasChildren.upsert({
                     where: { userId_childId: { userId: relation.userId, childId: relation.childId } },
@@ -285,11 +299,11 @@ const seed = async () => {
                     create: relation,
                 });
             }
-        } catch (error) {
-            console.error('Erreur à la création:', error);
         }
+        console.log('Données générées!');
+    } catch (error) {
+        console.error('Erreur lors de la génération des données:', error);
     }
-    console.log('Données générées!');
 };
 
 seed()

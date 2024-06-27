@@ -104,6 +104,8 @@ model Ad {
   city       String     @db.VarChar(50)
   country    String     @db.VarChar(50)
   attendees  Int?
+  lat        String     @db.VarChar(50)
+  lng        String     @db.VarChar(50)
   transport  Transport?
   conform    Boolean?
   status     AdStatus?
