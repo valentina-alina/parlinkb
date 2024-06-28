@@ -13,7 +13,7 @@ export class CategoryService {
   async create(data: Prisma.CategoryCreateInput): Promise<Category> {
     return this.prisma.category.create({
       data,
-  })
+    })
   }
 
   async findAll(): Promise<Category[]> {

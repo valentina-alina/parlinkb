@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -67,21 +67,21 @@ export class CategoryController {
   ): Promise<{category: Category, message: string}> {
     const category = await this.categoryService.findByUnique({ id });
       
-      if (!category) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if (!category) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
 
-      const categoryUpdate = await this.categoryService.update({ id },updateCategoryDto);
+    const categoryUpdate = await this.categoryService.update({ id },updateCategoryDto);
 
-      return {
-        category: categoryUpdate,
-        message: `La catégorie avec l'id ${id} a bien été mise à jour`
-      }
+    return {
+      category: categoryUpdate,
+      message: `La catégorie avec l'id ${id} a bien été mise à jour`
+    }
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<Category | { message: string}> {
-    const ad = await this.categoryService.findByUnique({ id })
+    const category = await this.categoryService.findByUnique({ id })
 
-    if(!ad) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if(!category) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
 
     this.categoryService.delete({ id });
 
