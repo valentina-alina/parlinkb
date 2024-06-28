@@ -5,17 +5,19 @@ import { Prisma, User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PRISMA_ERRORS } from '../../prisma/prisma.errors';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
 
   constructor(private prisma: PrismaService) {}
 
+  // async hashPassword(password: string): Promise<string> {
+  //   const salt = await bcrypt.genSalt(10);
+  //   return bcrypt.hash(password, salt);
+  // }
   async create(data: CreateUserDto): Promise<User> {
-    /* return this.prisma.user.create({
-      data,
-    }) */
-
+ 
     const user = await this.prisma.user.create(
       {data: {role : data.role, firstName : data.firstName, lastName: data.lastName, email :data.email, password:data.password}}
     );
@@ -67,12 +69,14 @@ export class UserService {
       where: Prisma.UserWhereUniqueInput,
       data: Prisma.UserUpdateInput
     ): Promise<User> {
+      // if (data.password) {
+      //   data.password = await this.hashPassword(data.password);}
       return this.prisma.user.update({
         where,
         data,
       });
   }
-
+  
   async delete(where: Prisma.UserWhereUniqueInput): Promise<User> {
     return this.prisma.user.delete({
       where,
@@ -98,4 +102,4 @@ export class UserService {
       return { message: message };
     }}
  
-}
+  }
