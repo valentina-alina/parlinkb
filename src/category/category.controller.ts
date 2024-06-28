@@ -40,7 +40,7 @@ export class CategoryController {
 
     return {
       categories,
-      message:`List des catégories`
+      message:`Liste des catégories`
     }
   }
 
