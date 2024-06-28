@@ -1,4 +1,15 @@
 /* eslint-disable prettier/prettier */
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
-//TODO:
-export class CreateCategoryDto {}
+export class CreateCategoryDto {
+    
+    @IsNotEmpty()
+    @IsString()
+    name: string;
+
+    @IsOptional()
+    ads?: null;
+
+    @IsOptional()
+    subCategory?: null;
+}

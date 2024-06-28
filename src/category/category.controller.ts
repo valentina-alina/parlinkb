@@ -1,8 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Category } from '@prisma/client';
 
 
 //TODO: CREATE CATEGORY | SUBCATEGORY
@@ -12,32 +13,78 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 //TODO: UPDATE CATEGORIES | SUBCATEGORIES
 //TODO: DELETE CATEGORIES | SUBCATEGORIES
 
-@Controller('category')
+@Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
+  async create(@Body() data: CreateCategoryDto): Promise<{category: Category, message: string}> {
+
+    const category = await this.categoryService.findByUnique({
+      name : data.name
+    })
+
+    if (!category) throw new HttpException(`L'utilisateur n'existe pas`, HttpStatus.CONFLICT)
+
+    const new_category = await this.categoryService.create(data);
+
+    return {
+      category: new_category,
+      message: `Catégorie créée`
+    }
   }
 
   @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  async findAll(): Promise<{categories: Category[], message: string}> {
+    const categories = await this.categoryService.findAll();
+
+    return {
+      categories,
+      message:`List des catégories`
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+  async findOne(
+    @Param('id') id: string
+  ): Promise<{category: Category, message: string}> {
+    const category = await this.categoryService.findByUnique({ id });
+
+    if (!category) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+
+    return {
+      category,
+      message: `Catégorie avec l'id ${id}`
+    };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoryService.update(+id, updateCategoryDto);
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto
+  ): Promise<{category: Category, message: string}> {
+    const category = await this.categoryService.findByUnique({ id });
+      
+      if (!category) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+
+      const categoryUpdate = await this.categoryService.update({ id },updateCategoryDto);
+
+      return {
+        category: categoryUpdate,
+        message: `La catégorie avec l'id ${id} a bien été mise à jour`
+      }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
+  async remove(@Param('id') id: string): Promise<Category | { message: string}> {
+    const ad = await this.categoryService.findByUnique({ id })
+
+    if(!ad) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+
+    this.categoryService.delete({ id });
+
+    return {
+      message: `La catégorie avec l'id ${id} a bien été supprimée`
+    }
   }
 }

@@ -1,29 +1,46 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Category, Prisma } from '@prisma/client';
+// import { CreateCategoryDto } from './dto/create-category.dto';
+// import { UpdateCategoryDto } from './dto/update-category.dto';
+import { PrismaService } from '../../prisma/prisma.service';
 
-
-//TODO:
 @Injectable()
 export class CategoryService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+
+  constructor(private prisma: PrismaService) {}
+  
+  async create(data: Prisma.CategoryCreateInput): Promise<Category> {
+    return this.prisma.category.create({
+      data,
+  })
   }
 
-  findAll() {
-    return `This action returns all category`;
+  async findAll(): Promise<Category[]> {
+    return this.prisma.category.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findByUnique(
+    categoryWhereUniqueInput: Prisma.CategoryWhereUniqueInput
+  ): Promise<Category | null> {
+    return this.prisma.category.findUnique({
+      where: categoryWhereUniqueInput
+    });
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async update(
+    where: Prisma.CategoryWhereUniqueInput,
+    data: Prisma.CategoryUpdateInput
+  ): Promise<Category> {
+    return this.prisma.category.update({
+      where,
+      data,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async delete(where: Prisma.CategoryWhereUniqueInput): Promise<Category> {
+    return this.prisma.category.delete({
+      where
+    });
   }
 }
