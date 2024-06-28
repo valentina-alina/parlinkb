@@ -20,6 +20,16 @@ export class CategoryService {
     return this.prisma.category.findMany();
   }
 
+  async findAllCategoryNames(): Promise<string[]> {
+    const categories = await this.prisma.category.findMany({
+      select: {
+        name: true,
+      },
+    });
+
+    return categories.map(category => category.name);
+  }
+
   async findByUnique(
     categoryWhereUniqueInput: Prisma.CategoryWhereUniqueInput
   ): Promise<Category | null> {

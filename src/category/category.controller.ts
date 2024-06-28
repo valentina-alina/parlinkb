@@ -35,13 +35,15 @@ export class CategoryController {
   }
 
   @Get()
-  async findAll(): Promise<{categories: Category[], message: string}> {
-    const categories = await this.categoryService.findAll();
+  async findAll(): Promise<{ categories: string[], message: string }> {
+    const categories = await this.categoryService.findAllCategoryNames();
+
+    if (!categories) throw new HttpException('La liste de catégories n\'a pas été trouvée', HttpStatus.CONFLICT)
 
     return {
       categories,
-      message:`Liste des catégories`
-    }
+      message: 'Liste des noms des catégories',
+    };
   }
 
   @Get(':id')
