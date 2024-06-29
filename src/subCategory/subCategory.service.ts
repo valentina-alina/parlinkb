@@ -45,11 +45,15 @@ export class SubCategoryService {
     });
   }
 
-  async getAllSubCategoriesNamesByCategoryId(categoryId: string): Promise<string[]> {
+  async getAllSubCategoriesNamesByCategoryName(
+    categoryName: string
+  ): Promise<string[]> {
     try {
       const subCategories = await this.prisma.subCategory.findMany({
         where: {
-          categoryId: categoryId,
+          category: {
+            name: categoryName,
+          },
         },
         select: {
           name: true,
@@ -57,15 +61,19 @@ export class SubCategoryService {
       });
 
       if (!subCategories || subCategories.length === 0) {
-        throw new NotFoundException(`No subcategories found for categoryId: ${categoryId}`);
+        throw new NotFoundException(
+          `No subcategories found for categoryName: ${categoryName}`
+        );
       }
 
-      return subCategories.map(subCategory => subCategory.name);
+      return subCategories.map((subCategory) => subCategory.name);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      throw new Error(`Failed to fetch subcategory names for categoryId: ${categoryId}`);
+      throw new Error(
+        `Failed to fetch subcategory names for categoryName: ${categoryName}`
+      );
     }
   }
 

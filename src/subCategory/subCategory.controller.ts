@@ -53,14 +53,14 @@ export class SubCategoryController {
     };
   } */
 
-  @Get(':categoryId')
-  async getSubCategoriesByCategoryId(@Param('categoryId') categoryId: string): Promise<{ subCategories: string[], message: string }> {
+  @Get(':categoryName')
+  async getSubCategoriesByCategoryName(@Param('categoryName') categoryName: string): Promise<{ subCategories: string[], message: string }> {
     try {
-      const subCategoryNames = await this.subCategoryService.getAllSubCategoriesNamesByCategoryId(categoryId);
+      const subCategoryNames = await this.subCategoryService.getAllSubCategoriesNamesByCategoryName(categoryName);
 
       return {
         subCategories: subCategoryNames,
-        message: `Liste des sous-catégories pour la catégorie avec l'id: ${categoryId}`,
+        message: `Liste des sous-catégories pour la catégorie avec l'id: ${categoryName}`,
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
