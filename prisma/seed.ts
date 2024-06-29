@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
+import { faker } from '@faker-js/faker/locale/fr';
 import { PrismaClient, UserStatus, Transport, AdStatus, FileType, UserAdStatus, UserRole } from '@prisma/client';
-import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
@@ -28,6 +28,13 @@ const generateUniqueNames = (count: number, generator: () => string) => {
 };
 
 const categoryNames = ['Covoiturage', 'Soutien', 'Garderie', 'Sortie'];
+
+const subCategoriesMap = {
+    'Covoiturage': ['Musées et centres d\'expositions', 'Zoos et aquariums', 'Parcs et jardins', 'Camps de vacances'],
+    'Soutien': ['Mathématiques', 'Enseignement moral et civique', 'Histoire-géographie', 'Technologie'],
+    'Garderie': ['La garde à domicile partagée', 'La crèche familiale', 'L\'assistance maternelle', 'La garde à domicile'],
+    'Sortie': ['Piscine', 'Promenade', 'Ressources', 'Parc']
+};
 
 const generateUsers = (count: number) => {
     const users = [];
@@ -84,15 +91,20 @@ const generateCategories = async () => {
     return categoryNames.map(name => categoryMap.get(name)!);
 };
 
-const generateSubCategories = (categoryIds: string[], count: number) => {
-    const uniqueNames = generateUniqueNames(count, faker.commerce.department);
-    const subCategories = uniqueNames.map((name, index) => ({
-        id: faker.string.uuid(),
-        name,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        categoryId: categoryIds[index % categoryIds.length],
-    }));
+const generateSubCategories = async (categoryMap: Map<string, string>) => {
+    const subCategories = [];
+    for (const [categoryName, subCategoryNames] of Object.entries(subCategoriesMap)) {
+        const categoryId = categoryMap.get(categoryName)!;
+        for (const subCategoryName of subCategoryNames) {
+            subCategories.push({
+                id: faker.string.uuid(),
+                name: subCategoryName,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                categoryId,
+            });
+        }
+    }
     return subCategories;
 };
 
@@ -112,7 +124,7 @@ const generateAds = async (userId: string, categoryIds: string[], subCategoryIds
                     address: faker.location.streetAddress(),
                     postalCode: faker.location.zipCode(),
                     city: faker.location.city(),
-                    country: faker.location.country().slice(0, 20),
+                    country: 'France',
                     attendees: faker.number.int({ min: 0, max: 100 }),
                     lat: faker.location.latitude().toString(),
                     lng: faker.location.longitude().toString(),
@@ -243,10 +255,14 @@ const seed = async () => {
         console.log('En cours de génération...');
         const categoryIds = await generateCategories();
 
-        // Generate subcategories for these fixed categories
-        const subCategories = generateSubCategories(categoryIds, 5);
-        const createdSubCategories = await Promise.all(subCategories.map(subCategory => prisma.subCategory.create({ data: subCategory })));
-        const subCategoryIds = createdSubCategories.map(subCategory => subCategory.id);
+        const categoryMap = new Map<string, string>();
+        for (let i = 0; i < categoryNames.length; i++) {
+            categoryMap.set(categoryNames[i], categoryIds[i]);
+        }
+
+        // Generate specific subcategories for each category
+        const subCategories = await generateSubCategories(categoryMap);
+        await Promise.all(subCategories.map(subCategory => prisma.subCategory.create({ data: subCategory })));
 
         // Generate subjects, children, users, profiles, and associations
         const subjects = generateSubjects(5);
@@ -262,7 +278,7 @@ const seed = async () => {
             const profile = generateProfiles(createdUser.id);
             await prisma.profile.create({ data: profile });
 
-            const ads = await generateAds(createdUser.id, categoryIds, subCategoryIds, 3);
+            const ads = await generateAds(createdUser.id, categoryIds, subCategories.map(sub => sub.id), 3);
             const adIds = ads.map(ad => ad.id);
 
             for (const ad of ads) {

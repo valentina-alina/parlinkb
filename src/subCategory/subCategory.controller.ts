@@ -5,8 +5,9 @@ import { CreateSubCategoryDto } from './dto/create-subCategory.dto';
 import { UpdateSubCategoryDto } from './dto/update-subCategory.dto';
 import { SubCategory } from '@prisma/client';
 
-@Controller('sub-category')
+@Controller('subCategories')
 export class SubCategoryController {
+
   constructor(private readonly subCategoryService: SubCategoryService) {}
 
   @Post()

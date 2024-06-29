@@ -10,7 +10,7 @@ import { HttpExceptionFilter } from './filters/http-exception.filters';
 import { CustomHttpExceptionFilter } from './filters/custom-exception.filters';
 import { LoggingInterceptor } from './interceptors/logging.interceptors';
 import { TransformInterceptor } from './interceptors/transform.interceptors';
-import * as cors from 'cors';
+import cors from 'cors';
 
 async function bootstrap() {
   console.log('Application NestJS en cours de démarrage...');

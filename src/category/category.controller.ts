@@ -24,7 +24,7 @@ export class CategoryController {
       name : data.name
     })
 
-    if (!category) throw new HttpException(`L'utilisateur n'existe pas`, HttpStatus.CONFLICT)
+    if (!category) throw new HttpException(`La catégorie n'existe pas`, HttpStatus.CONFLICT)
 
     const new_category = await this.categoryService.create(data);
 
