@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSubCategoryDto } from './dto/create-subCategory.dto';
 // import { UpdateSubCategoryDto } from './dto/update-subCategory.dto';
 import { Prisma, SubCategory } from '@prisma/client';
@@ -43,6 +43,30 @@ export class SubCategoryService {
     return this.prisma.subCategory.findUnique({
       where: subCategoryWhereUniqueInput
     });
+  }
+
+  async getAllSubCategoriesNamesByCategoryId(categoryId: string): Promise<string[]> {
+    try {
+      const subCategories = await this.prisma.subCategory.findMany({
+        where: {
+          categoryId: categoryId,
+        },
+        select: {
+          name: true,
+        },
+      });
+
+      if (!subCategories || subCategories.length === 0) {
+        throw new NotFoundException(`No subcategories found for categoryId: ${categoryId}`);
+      }
+
+      return subCategories.map(subCategory => subCategory.name);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(`Failed to fetch subcategory names for categoryId: ${categoryId}`);
+    }
   }
 
   async update(

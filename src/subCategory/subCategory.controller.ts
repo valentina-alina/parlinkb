@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Param, Put, Delete, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { SubCategoryService } from './subCategory.service';
 import { CreateSubCategoryDto } from './dto/create-subCategory.dto';
 import { UpdateSubCategoryDto } from './dto/update-subCategory.dto';
@@ -39,7 +39,7 @@ export class SubCategoryController {
     };
   }
 
-  @Get(':id')
+  /*  @Get(':id')
   async findOne(
     @Param('id') id: string
   ): Promise<{subCategory: SubCategory, message: string}> {
@@ -51,6 +51,23 @@ export class SubCategoryController {
       subCategory,
       message: `Sous-catégorie avec l'id ${id}`
     };
+  } */
+
+  @Get(':categoryId')
+  async getSubCategoriesByCategoryId(@Param('categoryId') categoryId: string): Promise<{ subCategories: string[], message: string }> {
+    try {
+      const subCategoryNames = await this.subCategoryService.getAllSubCategoriesNamesByCategoryId(categoryId);
+
+      return {
+        subCategories: subCategoryNames,
+        message: `Liste des sous-catégories pour la catégorie avec l'id: ${categoryId}`,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
   }
 
   @Put(':id')

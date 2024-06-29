@@ -165,7 +165,7 @@ export class AdController {
     }
   }
 
-  @Post(':id/subscribe')
+  @Post('subscribe/:id')
   async subscribeUserToAd(
     @Param('id') adId: string,
     @Body() { userId }: { userId: string },
@@ -185,7 +185,7 @@ export class AdController {
     };
   }
 
-  @Get(':userId/subscriptions')
+  @Get('subscriptions/:userId')
   async getSubscriptionsByUserId(@Param('userId') userId: string): Promise<{ subscriptions: UserHasAds[], message: string }> {
 
     const subscriptions = await this.adService.getAllSubscriptionsByUserId(userId);
@@ -196,7 +196,7 @@ export class AdController {
     };
   }
 
-  @Get(':userId/subscriptions/params')
+  @Get('subscriptions/:userId/params')
   async getSubscriptionsByUserParams(
     @Param('userId') userId: string,
     @Query() params: { title?: string, city?: string }
@@ -209,7 +209,7 @@ export class AdController {
     };
   }
 
-  @Put(':userId/subscriptions/:adId')
+  @Put('subscriptions/:userId/:adId')
   async updateUserAdSubscription(
     @Param('userId') userId: string,
     @Param('adId') adId: string,
@@ -224,7 +224,7 @@ export class AdController {
     };
   }
 
-  @Delete(':userId/subscriptions/:adId')
+  @Delete('subscriptions/:userId/:adId')
   async deleteUserAdSubscription(
     @Param('userId') userId: string,
     @Param('adId') adId: string
