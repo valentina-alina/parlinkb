@@ -10,7 +10,6 @@ import { HttpExceptionFilter } from './filters/http-exception.filters';
 import { CustomHttpExceptionFilter } from './filters/custom-exception.filters';
 import { LoggingInterceptor } from './interceptors/logging.interceptors';
 import { TransformInterceptor } from './interceptors/transform.interceptors';
-import cors from 'cors';
 
 async function bootstrap() {
   console.log('Application NestJS en cours de démarrage...');
@@ -18,12 +17,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   console.log('Application NestJS créée.');
 
-  app.use(cors({
-    origin: 'http://localhost:5173',
+  app.enableCors({
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-  }));
-  console.log('CORS configuré')
+    credentials: true,
+  });
+  console.log('CORS configuré');
 
   app.useGlobalPipes(new ValidationPipe());
   console.log('Global validation pipe configuré.');
@@ -43,7 +43,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   console.log('Documentation Swagger documentation configurée.');
-  await app.listen(3000);
+  await app.listen(3000, '0.0.0.0');
   console.log('L\'application NestJS écoute sur le port 3000.');
 }
 bootstrap();
