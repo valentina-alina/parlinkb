@@ -10,6 +10,7 @@ import { HttpExceptionFilter } from './filters/http-exception.filters';
 import { CustomHttpExceptionFilter } from './filters/custom-exception.filters';
 import { LoggingInterceptor } from './interceptors/logging.interceptors';
 import { TransformInterceptor } from './interceptors/transform.interceptors';
+import { SetHeadersInterceptor } from './interceptors/set-headers.interceptors';
 
 async function bootstrap() {
   console.log('Application NestJS en cours de démarrage...');
@@ -31,7 +32,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   console.log('Global validation pipe configuré.');
 
-  app.useGlobalInterceptors(new LoggingInterceptor(), new TransformInterceptor());
+  app.useGlobalInterceptors(new LoggingInterceptor(), new TransformInterceptor(), new SetHeadersInterceptor());
   console.log('Interceptors configurés.');
 
   app.useGlobalFilters(new HttpExceptionFilter(), new CustomHttpExceptionFilter());
