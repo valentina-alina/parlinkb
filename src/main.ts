@@ -17,8 +17,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   console.log('Application NestJS créée.');
 
+  // mettre dans .env les adresses origin avec les quels on doit travailler dans le front. 
+  const localhot_url= process.env.LOCALHOST_URL;
+  const ipv4_url= process.env.IPV4_URL;
   app.enableCors({
-    origin: '*',
+    origin: [localhot_url,ipv4_url], 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

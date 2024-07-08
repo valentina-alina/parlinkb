@@ -63,7 +63,9 @@ export class AdController {
     }
   }
 
+  @UseGuards(AuthGuard)
   @Get()
+
   async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<{ads: Ad[], message: string}> {
     const new_options: Prisma.AdFindManyArgs = {}
     options.skip? new_options.skip = +options.skip : null
