@@ -10,7 +10,8 @@ import {
   UnauthorizedException,
   UseGuards,
   Param,
-  Put
+  Put,
+  Query
 } from "@nestjs/common";
 import { AuthService } from "../auth/auth.service";
 import { UserService } from '../user/user.service';
@@ -37,7 +38,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
 
 
-
+@UseGuards(AuthGuard)
 @Controller('user')
 export class UserController {
   constructor(
@@ -50,8 +51,7 @@ export class UserController {
     private userHasSubjectService: UserHasSubjectService,
   ) {}
 
-  //FIXME: // ?? register un user by a admin : voir s'il faut verifier que l'user connecté est un admin: meme si c'est fait dans le front
-  @UseGuards(AuthGuard)
+
   @UseGuards(AdminGuard)
   @Post('register')
   async signup(
@@ -69,8 +69,7 @@ export class UserController {
 
       messages = [...messages, `🚀 New user ${new_user.firstName} ${new_user.lastName} was created`];
    
-      // console.log(" New user created ", new_user)
-      
+          
       if (data.subjects) {
           const subjects = data.subjects;
           await Promise.all(subjects.map(async (sub) => {
@@ -101,9 +100,7 @@ export class UserController {
               console.log("🚀 user has child:created", new_user_has_child);
           }));
       }
-      console.log(messages);
-
-      return {
+       return {
           user: new_user,
           messages
       }
@@ -140,7 +137,7 @@ export class UserController {
 
  
 
-  // //TODO: USER
+  // // //TODO: USER
   // @UseGuards(AuthRefreshGuard)
   // @Post('signout')
   // async logout(
@@ -193,24 +190,19 @@ export class UserController {
     };
   }
 
-  
-    //FIXME: //?USER ? ou auth verifier et preciser le choix
-//     @UseGuards(AuthRefreshGuard)
-//     @Get('refresh_token')
-//     async refreshTokens(
-//         @Req() req: Request
-//     ): Promise<{ access_token: string, refresh_token: string, user: User }> {
-//         const user = await this.userService.findByRefreshToken(req.refreshToken)
-//         if (!user) throw new UnauthorizedException('server error')
+  @Get()
+  async findAllByParams(@Query() query: { skip?: string, take?: string }): Promise<{ [key: string]: User[] | string }> {
+    const prismaOptions: Prisma.UserFindManyArgs = {};
+    if (query.skip) prismaOptions.skip = +query.skip;
+    if (query.take) prismaOptions.take = +query.take;
 
-//         const refresh_token = await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '8h' })
-//         this.userService.update({ id: user.id }, { refreshToken: refresh_token })
-//         delete user.password
-//         delete user.refreshToken
-//         return {
-//             access_token: await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_SECRET, expiresIn: '20m' }),
-//             refresh_token,
-//             user
-//         }
-//     }
+    const out = await this.userService.findAllByParams(prismaOptions);
+    const message = `All files`;
+    return {
+      ['users']: out,
+      message
+    };
+  }
+
+   
 }

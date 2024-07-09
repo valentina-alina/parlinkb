@@ -18,7 +18,7 @@ import { LoginUserDto } from "./dto/login-user.dto";
 
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from "@prisma/client";
+import { User, UserRole } from "@prisma/client";
 
 import { CustomException } from "../../src/exceptions/custom.exception";
 
@@ -32,19 +32,23 @@ export class AuthController {
         private userService: UserService,
         private jwtService: JwtService,
     ) { }
-
+  
     @Post('register')
     async signup(
         @Body() data: CreateAdminDto): Promise<{ user: User, messages: string[] }> {
-
+          
         let messages: string[] = [];
+        let role: UserRole="admin";
+      console.log(data)
 
         const user = await this.userService.findByUnique({ email: data.email })
 
         if (user) throw new CustomException('L\'utilisateur existe déjà', HttpStatus.CONFLICT, "UC-create-1")
 
         const passwordIni = await this.authService.hash(this.authService.generateRandomPassword(10));
-        const userAdmin = await this.userService.create({ ...data, password: passwordIni, role: "admin" });
+        const a={ ...data, password: passwordIni, role: role};
+        console.log("a",a)
+        const userAdmin = await this.userService.create({ ...data, password: passwordIni, role: role});
 
         messages = [...messages, `🚀 New user ${userAdmin.firstName} ${userAdmin.lastName} was created`];
 

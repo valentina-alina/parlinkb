@@ -7,40 +7,56 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from 'jwt-decode';
+
+
+interface MyJwtPayload {
+    userId: string;
+    role: string;
+    iat: number;
+    exp: number;
+    // Ajoutez d'autres propriétés ici si nécessaire
+}
 
 @Injectable()
 export class AdminGuard implements CanActivate {
-constructor(private jwtService: JwtService) {}
+    constructor(private jwtService: JwtService) {}
 
-async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        const request = context.switchToHttp().getRequest();
+        const token = this.extractTokenFromHeader(request);
 
-    const tokenDecode =token?jwtDecode(token):undefined;
-    const { auth } = tokenDecode.role;
-
-    if (auth!=="admin") {
-    throw new UnauthorizedException();
-    }
-    try {
-    const payload = await this.jwtService.verifyAsync(
-        token,
-        {
-            secret: process.env.JWT_SECRET
+        if (!token) {
+            throw new UnauthorizedException('Access denied: Token not found');
         }
-    );
-    // 💡 We're assigning the payload to the request object here
-    // so that we can access it in our route handlers
-    request['user'] = payload;
-    } catch(error) {
-    throw new UnauthorizedException(error);
-    }
-    return true;
-}
 
-private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+        let tokenDecode: MyJwtPayload;
+
+        try {
+            tokenDecode = jwtDecode<MyJwtPayload>(token);
+        } catch (error) {
+            throw new UnauthorizedException('Invalid token');
+        }
+
+        if (tokenDecode.role !== 'admin') {
+            console.log('role=', tokenDecode.role, 'is not admin:', tokenDecode.role !== 'admin');
+            throw new UnauthorizedException('Access denied: Admins only');
+        }
+
+        try {
+            const payload = await this.jwtService.verifyAsync(token, {
+                secret: process.env.JWT_SECRET,
+            });
+            request['user'] = payload;
+        } catch (error) {
+            throw new UnauthorizedException('Invalid token');
+        }
+
+        return true;
+    }
+
+    private extractTokenFromHeader(request: Request): string | undefined {
+        const [type, token] = request.headers.authorization?.split(' ') ?? [];
         return type === 'Bearer' ? token : undefined;
     }
 }
