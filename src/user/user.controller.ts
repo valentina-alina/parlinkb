@@ -11,13 +11,16 @@ import {
   UseGuards,
   Param,
   Put,
-  Query
+  Query,
+  ExecutionContext
 } from "@nestjs/common";
 import { AuthService } from "../auth/auth.service";
 import { UserService } from '../user/user.service';
 
 import { Request as ExpressRequest } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { GetToken } from '../guards/getToken.decorator' 
+import { jwtDecode } from 'jwt-decode';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { AuthRefreshGuard } from '../../src/guards/refresh.jwt.guards';
@@ -36,9 +39,11 @@ import { AdminGuard } from "../guards/admin.jwt.guards";
 
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
+import { jwtPayloadDto } from "../guards/jwtPayload.dto"
 
 
 @UseGuards(AuthGuard)
+// @UseGuards(AuthRefreshGuard)
 @Controller('user')
 export class UserController {
   constructor(
@@ -135,23 +140,40 @@ export class UserController {
  
 
 
+  @Post('signout')
+  async logout(@GetToken() token: string): Promise<{ }> {
+    console.log(token)
  
+      if (!token) {
+            throw new UnauthorizedException('Access denied: Token not found');
+        }
 
-  // // //TODO: USER
-  // @UseGuards(AuthRefreshGuard)
-  // @Post('signout')
-  // async logout(
-  //     @Req() req: Request
-  // ): Promise<{ message: string }> {
-  //     const userId = String(req.user.sub);
-  //     const user = await this.userService.findByUnique({ id: userId })
-  //     if (!user) throw new HttpException('Erreur', HttpStatus.CONFLICT)
+        let tokenDecode: jwtPayloadDto;
 
-  //     this.userService.update({ id: user.id }, { refreshToken: '' })
-  //     return {
-  //         message: 'Vous avez bien été déconnecté'
-  //     }
-  // }
+        try {
+            tokenDecode = jwtDecode<jwtPayloadDto>(token);
+        } catch (error) {
+            throw new UnauthorizedException('Invalid token');
+        }
+      const userId = tokenDecode.userId;
+      const user = await this.userService.findByUnique({ id: userId })
+      if (!user) throw new HttpException('Erreur: user non trouvé', HttpStatus.CONFLICT)
+        
+        const payload = { userId: "", role: "" }
+        const access_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '20m' })
+
+        // const refresh_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '7d' });
+        
+      this.userService.update({ id: user.id }, { refreshToken: '' })
+      return {accestoken : access_token,
+        refreshToken: '',
+          message: 'Vous avez bien été déconnecté'
+      }
+  }
+//   private extractTokenFromHeader(request: Request): string | undefined {
+//     const [type, token] = request.headers.auth ?.split(' ') ?? [];
+//     return type === 'Bearer' ? token : undefined;
+// }
 
   // //FIXME: //?USER ?
   // @UseGuards(AuthRefreshGuard)
@@ -191,18 +213,19 @@ export class UserController {
   }
 
   @Get()
-  async findAllByParams(@Query() query: { skip?: string, take?: string }): Promise<{ [key: string]: User[] | string }> {
+  async getUsersWithDetails(@Query() query: { skip?: string; take?: string }): Promise<{ users :any[], message :string }> {
     const prismaOptions: Prisma.UserFindManyArgs = {};
     if (query.skip) prismaOptions.skip = +query.skip;
     if (query.take) prismaOptions.take = +query.take;
 
-    const out = await this.userService.findAllByParams(prismaOptions);
-    const message = `All files`;
+    const users = await this.userService.getUsersWithDetails(prismaOptions);
+    const message = 'All users with details';
+
     return {
-      ['users']: out,
-      message
-    };
+          users,
+          message
+        };
   }
+}
 
    
-}

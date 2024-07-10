@@ -5,10 +5,12 @@ import { Ad, Prisma, UserHasAds } from '@prisma/client';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { UserService } from '../../src/user/user.service';
+import { AdminGuard } from '../guards/admin.jwt.guards';
 import { AuthGuard } from '../guards/jwt.guards';
 import { GetAdsFilterDto } from './dto/get-ads-filter.dto';
 import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
 import { GetAdsUserDto } from './dto/get-ads-user.dto';
+
 
 //? ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
 //? ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
@@ -21,7 +23,8 @@ import { GetAdsUserDto } from './dto/get-ads-user.dto';
 //? USER UPDATE SUBSCRIPTIONS
 //? USER DELETE SUBSCRIPTIONS
 
-
+@UseGuards(AuthGuard)
+// @UseGuards(AdminGuard)
 @Controller('ad')
 export class AdController {
   constructor(
@@ -63,7 +66,8 @@ export class AdController {
     }
   }
 
-  @UseGuards(AuthGuard)
+
+
   @Get()
 
   async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<{ads: Ad[], message: string}> {

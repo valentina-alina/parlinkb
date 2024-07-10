@@ -8,15 +8,8 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { jwtDecode } from 'jwt-decode';
+import { jwtPayloadDto } from './jwtPayload.dto';
 
-
-interface MyJwtPayload {
-    userId: string;
-    role: string;
-    iat: number;
-    exp: number;
-    // Ajoutez d'autres propriétés ici si nécessaire
-}
 
 @Injectable()
 export class AdminGuard implements CanActivate {
@@ -30,10 +23,10 @@ export class AdminGuard implements CanActivate {
             throw new UnauthorizedException('Access denied: Token not found');
         }
 
-        let tokenDecode: MyJwtPayload;
+        let tokenDecode: jwtPayloadDto;
 
         try {
-            tokenDecode = jwtDecode<MyJwtPayload>(token);
+            tokenDecode = jwtDecode<jwtPayloadDto>(token);
         } catch (error) {
             throw new UnauthorizedException('Invalid token');
         }
