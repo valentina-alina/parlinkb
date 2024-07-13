@@ -112,15 +112,17 @@ const generateAds = async (userId: string, categoryIds: string[], subCategoryIds
     const ads = [];
     for (let i = 0; i < count; i++) {
         const adId = faker.string.uuid();
+        const startTime = faker.date.future();
+        const endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
         try {
             const createdAd = await prisma.ad.create({
                 data: {
                     id: adId,
                     title: faker.lorem.words(5).slice(0, 50),
                     description: faker.lorem.paragraph(),
-                    startTime: faker.date.future(),
-                    endTime: faker.date.future(),
-                    duration: faker.number.int({ min: 1, max: 8 }),
+                    startTime: startTime,
+                    endTime: endTime,
+                    duration: 1,
                     address: faker.location.streetAddress(),
                     postalCode: faker.location.zipCode(),
                     city: faker.location.city(),
