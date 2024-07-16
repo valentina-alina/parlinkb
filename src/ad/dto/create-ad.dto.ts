@@ -35,12 +35,6 @@ export class CreateAdDto {
     @IsOptional()
     attendees?: number;
 
-    @IsNotEmpty()
-    lat: string;
-
-    @IsNotEmpty()
-    lng: string;
-
     @IsEnum(Transport)
     transport?: Transport;
 
