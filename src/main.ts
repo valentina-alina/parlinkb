@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import * as dotenv from 'dotenv';
 dotenv.config();
-
+import compression from 'compression';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -37,6 +37,9 @@ async function bootstrap() {
 
   app.useGlobalFilters(new HttpExceptionFilter(), new CustomHttpExceptionFilter());
   console.log('Global exception filters configurés.');
+
+  app.use(compression());
+  console.log('Compression configuré.');
 
   const config = new DocumentBuilder()
   .setTitle('alt-bootcamp')
