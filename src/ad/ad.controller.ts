@@ -46,8 +46,6 @@ export class AdController {
       city: data.city,
       country: data.country,
       attendees: data.attendees,
-      lat: data.lat,
-      lng: data.lng,
       transport: data.transport,
       conform: data.conform,
       status: data.status,
