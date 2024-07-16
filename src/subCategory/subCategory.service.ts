@@ -27,6 +27,14 @@ export class SubCategoryService {
     return this.prisma.subCategory.findMany();
   }
 
+  async findByFirstName(name: string): Promise<SubCategory | null> {
+    return this.prisma.subCategory.findFirst({
+      where: {
+        name: name
+      },
+    });
+  } 
+
   async findAllSubCategoryNames(): Promise<string[]> {
     const subCategories = await this.prisma.subCategory.findMany({
       select: {

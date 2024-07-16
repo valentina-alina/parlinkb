@@ -53,6 +53,20 @@ export class SubCategoryController {
     };
   } */
 
+  @Get('name/:name')
+  async findOneName(
+    @Param('name') name: string
+  ): Promise<{subCategory: SubCategory, message: string}> {
+    const subCategory = await this.subCategoryService.findByFirstName(name);
+
+    if (!subCategory) throw new HttpException('La subcatégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+
+    return {
+      subCategory,
+      message: `Subcatégorie ${name}`
+    };
+  } 
+
   @Get(':categoryName')
   async getSubCategoriesByCategoryName(@Param('categoryName') categoryName: string): Promise<{ subCategories: string[], message: string }> {
     try {
