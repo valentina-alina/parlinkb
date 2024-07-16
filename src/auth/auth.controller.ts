@@ -32,14 +32,14 @@ export class AuthController {
         private userService: UserService,
         private jwtService: JwtService,
     ) { }
-  
+
     @Post('register')
     async signup(
         @Body() data: CreateAdminDto): Promise<{ user: User, messages: string[] }> {
-          
+
         let messages: string[] = [];
-        let role: UserRole="admin";
-      console.log(data)
+        const role: UserRole="admin";
+        console.log(data)
 
         const user = await this.userService.findByUnique({ email: data.email })
 
