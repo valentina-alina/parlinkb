@@ -128,8 +128,6 @@ const generateAds = async (userId: string, categoryIds: string[], subCategoryIds
                     city: faker.location.city(),
                     country: 'France',
                     attendees: faker.number.int({ min: 0, max: 100 }),
-                    lat: faker.location.latitude().toString(),
-                    lng: faker.location.longitude().toString(),
                     transport: faker.helpers.arrayElement(['car', 'van']) as Transport,
                     conform: faker.datatype.boolean(),
                     status: faker.helpers.arrayElement(['cancel', 'report']) as AdStatus,
