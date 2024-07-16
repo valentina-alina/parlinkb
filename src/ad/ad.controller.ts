@@ -10,6 +10,7 @@ import { GetAdsFilterDto } from './dto/get-ads-filter.dto';
 import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
 import { GetAdsUserDto } from './dto/get-ads-user.dto';
 
+
 //? ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
 //? ROUTE FILTRE CATÉGORIE & SOUS-CATÉGORIE
 //? ROUTE PAGINATION??
@@ -21,7 +22,7 @@ import { GetAdsUserDto } from './dto/get-ads-user.dto';
 //? USER UPDATE SUBSCRIPTIONS
 //? USER DELETE SUBSCRIPTIONS
 
-
+@UseGuards(AuthGuard)
 @Controller('ad')
 export class AdController {
   constructor(
@@ -61,7 +62,10 @@ export class AdController {
     }
   }
 
+
+
   @Get()
+
   async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<{ads: Ad[], message: string}> {
     const new_options: Prisma.AdFindManyArgs = {}
     options.skip? new_options.skip = +options.skip : null

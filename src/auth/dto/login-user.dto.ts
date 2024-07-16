@@ -1,16 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { IsNotEmpty, IsString, MinLength, MaxLength, IsAlpha } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginUserDto {
-
     @IsNotEmpty()
-    @IsString()
-    @MinLength(4, { message: 'Le prénom doit comporter plus 4 caractères'})
-    @MaxLength(20, { message: 'Le prénom doit comporter moins de 20 caractères'})
-    @IsAlpha()
+    @IsEmail()
     @ApiProperty({ required: true })
-    firstName: string;
+    email: string;
 
     @IsNotEmpty()
     @IsString()

@@ -46,6 +46,20 @@ export class CategoryController {
     };
   }
 
+  @Get('name/:name')
+  async findOneName(
+    @Param('name') name: string
+  ): Promise<{category: Category, message: string}> {
+    const category = await this.categoryService.findByFirstName(name);
+
+    if (!category) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+
+    return {
+      category,
+      message: `Catégorie ${name}`
+    };
+  } 
+
   @Get(':id')
   async findOne(
     @Param('id') id: string

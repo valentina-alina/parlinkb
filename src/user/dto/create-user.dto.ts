@@ -11,7 +11,7 @@ export class CreateUserDto {
 
     @IsNotEmpty()
     @IsString()
-    @MinLength(4, { message: 'Le prénom doit comporter plus 4 caractères'})
+    @MinLength(2, { message: 'Le prénom doit comporter plus 2 caractères'})
     @MaxLength(20, { message: 'Le prénom doit comporter moins de 20 caractères'})
     @IsAlpha()
     @ApiProperty({ required: true })
@@ -19,7 +19,7 @@ export class CreateUserDto {
 
     @IsNotEmpty()
     @IsString()
-    @MinLength(4, { message: 'Le nom doit comporter plus 4 caractères'})
+    @MinLength(2, { message: 'Le nom doit comporter plus 2 caractères'})
     @MaxLength(20, { message: 'Le nom doit comporter moins de 20 caractères'})
     @IsAlpha()
     @ApiProperty({ required: true })

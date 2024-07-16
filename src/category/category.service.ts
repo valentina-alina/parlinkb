@@ -30,6 +30,14 @@ export class CategoryService {
     return categories.map(category => category.name);
   }
 
+  async findByFirstName(name: string): Promise<Category | null> {
+    return this.prisma.category.findFirst({
+      where: {
+        name: name
+      },
+    });
+  } 
+
   async findByUnique(
     categoryWhereUniqueInput: Prisma.CategoryWhereUniqueInput
   ): Promise<Category | null> {
