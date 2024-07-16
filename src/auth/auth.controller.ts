@@ -2,15 +2,21 @@
 import {
     Body,
     Controller,
+    Get,
     HttpException,
     HttpStatus,
     Param,
     Post,
     Put,
+    Req,
+    UnauthorizedException,
+    UseGuards,
 } from "@nestjs/common";
 
 import { AuthService } from "./auth.service";
 import { UserService } from '../user/user.service';
+
+import { Request as ExpressRequest } from 'express';
 
 import { CreateAdminDto } from "./dto/createAdmin.dto"
 import { ChangePasswordDto } from "./dto/changePassword.dto";
@@ -21,8 +27,14 @@ import * as bcrypt from 'bcrypt';
 import { User, UserRole } from "@prisma/client";
 
 import { CustomException } from "../../src/exceptions/custom.exception";
+import { AuthRefreshGuard } from "src/guards/refresh.jwt.guards";
 
 // TODO envoyer mail avec l'id de l'admin crée dans un jwttoken
+
+interface Request extends ExpressRequest {
+    user?: { sub: number, email: string };
+    refreshToken: string;
+}
 
 @Controller('auth')
 export class AuthController {
@@ -114,6 +126,25 @@ export class AuthController {
             access_token,
             refresh_token,
             message
+        }
+    }
+
+    @UseGuards(AuthRefreshGuard)
+    @Get('refresh_token')
+    async refreshTokens(
+        @Req() req: Request
+    ): Promise<{ access_token: string, refresh_token: string, user: User }> {
+        const user = await this.userService.findByRefreshToken(req.refreshToken)
+        if (!user) throw new UnauthorizedException('server error')
+
+        const refresh_token = await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '8h' })
+        this.userService.update({ id: user.id }, { refreshToken: refresh_token })
+        delete user.password
+        delete user.refreshToken
+        return {
+            access_token: await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_SECRET, expiresIn: '20m' }),
+            refresh_token,
+            user
         }
     }
 
