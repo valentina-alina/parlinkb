@@ -120,23 +120,23 @@ export class UserController {
   }
 
   @UseGuards(AuthRefreshGuard)
-    @Get('refresh_token')
-    async refreshTokens(
-        @Req() req: Request
-    ): Promise<{ access_token: string, refresh_token: string, user: User }> {
-      const user = await this.userService.findByRefreshToken(req.refreshToken)
-      if (!user) throw new UnauthorizedException('server error')
+  @Get('refresh_token')
+  async refreshTokens(
+      @Req() req: Request
+  ): Promise<{ access_token: string, refresh_token: string, user: User }> {
+    const user = await this.userService.findByRefreshToken(req.refreshToken)
+    if (!user) throw new UnauthorizedException('server error')
 
-      const refresh_token = await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '8h' })
-      await this.userService.update({ id: user.id }, { refreshToken: refresh_token });
+    const refresh_token = await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '8h' })
+    await this.userService.update({ id: user.id }, { refreshToken: refresh_token });
 
-      delete user.password
-      delete user.refreshToken
-      return {
-          access_token: await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_SECRET, expiresIn: '20m' }),
-          refresh_token,
-          user
-      }
+    delete user.password
+    delete user.refreshToken
+    return {
+        access_token: await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_SECRET, expiresIn: '20m' }),
+        refresh_token,
+        user
+    }
   }
 
   @Post('signout')
