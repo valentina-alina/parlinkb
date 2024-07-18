@@ -6,27 +6,30 @@ import {
   HttpException,
   HttpStatus,
   Post,
-  Req,Delete,
   UnauthorizedException,
   UseGuards,
   Param,
-  Put,
   Query,
-  ExecutionContext
+  Req,
+  /* Put,
+  Req,
+  Delete,
+  ExecutionContext */
 } from "@nestjs/common";
 import { AuthService } from "../auth/auth.service";
 import { UserService } from '../user/user.service';
 
-import { Request as ExpressRequest } from 'express';
+// import { Request as ExpressRequest } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { GetToken } from '../guards/getToken.decorator' 
 import { jwtDecode } from 'jwt-decode';
-import * as bcrypt from 'bcrypt';
-import { randomBytes } from 'crypto';
-import { AuthRefreshGuard } from '../../src/guards/refresh.jwt.guards';
-import { Child} from "@prisma/client";
+// import * as bcrypt from 'bcrypt';
+// import { randomBytes } from 'crypto';
+// import { AuthRefreshGuard } from '../../src/guards/refresh.jwt.guards';
+// import { Child} from "@prisma/client";
 import { CustomException } from "../../src/exceptions/custom.exception";
-import { RegisterUserDto } from "../user/dto/register-user.dto"
+import { RegisterUserDto } from "../user/dto/register-user.dto";
+import { Request as ExpressRequest } from 'express';
 
 import { SubjectService } from "../subject/subject.service";
 import { ChildService } from "../child/child.service";
@@ -37,10 +40,15 @@ import { UserHasSubjectService } from "../userHasSubject/userHasSubject.service"
 import { AuthGuard } from '../guards/jwt.guards';
 import { AdminGuard } from "../guards/admin.jwt.guards";
 
-import { UpdateUserDto } from './dto/update-user.dto';
+// import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
 import { jwtPayloadDto } from "../guards/jwtPayload.dto"
+import { AuthRefreshGuard } from "src/guards/refresh.jwt.guards";
 
+interface Request extends ExpressRequest {
+  user?: { sub: number, email: string };
+  refreshToken: string;
+}
 
 @UseGuards(AuthGuard)
 // @UseGuards(AuthRefreshGuard)
@@ -69,11 +77,11 @@ export class UserController {
       if (user) throw new CustomException('L\'utilisateur existe déjà', HttpStatus.CONFLICT, "UC-create-1")
 
       const passwordIni = await this.authService.hash(this.authService.generateRandomPassword(10));
-     
+
       const new_user = await this.userService.create({ ...data.user, password: passwordIni });
 
       messages = [...messages, `🚀 New user ${new_user.firstName} ${new_user.lastName} was created`];
-   
+
           
       if (data.subjects) {
           const subjects = data.subjects;
@@ -105,45 +113,36 @@ export class UserController {
               console.log("🚀 user has child:created", new_user_has_child);
           }));
       }
-       return {
+        return {
           user: new_user,
           messages
       }
   }
 
+  @UseGuards(AuthRefreshGuard)
+    @Get('refresh_token')
+    async refreshTokens(
+        @Req() req: Request
+    ): Promise<{ access_token: string, refresh_token: string, user: User }> {
+      const user = await this.userService.findByRefreshToken(req.refreshToken)
+      if (!user) throw new UnauthorizedException('server error')
 
+      const refresh_token = await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '8h' })
+      await this.userService.update({ id: user.id }, { refreshToken: refresh_token });
 
-  // // FIXME: effacer aussi toutes les autres jointures par rapport a user : file, messge, ad, usergroup.....
-  // @Delete('delete/:userId')
-  // async deleteByUserId(@Param('userId') userId: string): Promise<{ message: string }> {
-  //   try {
-  //     // TODO verif si user has subject existe
-  //     const userHasSubject = await this.userHasSubjectService.deleteByUserId(userId);
-  // } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  //   }
-  //   console.log("🚀 ~ AuthController ~ deleteByUserId ~   user has subject")
-  //   try {
-  //     const uhcService = await this.uhcService.deleteByUserId(userId);
-  // } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  //   }
-  //   console.log("🚀 ~ AuthController ~ deleteByUserId ~   user has child")
-  //   try {
-  //     const result = await this.userService.deleteByUserId(userId);
-  //     return result;
-
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  //   }
-  // }
- 
-
+      delete user.password
+      delete user.refreshToken
+      return {
+          access_token: await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_SECRET, expiresIn: '20m' }),
+          refresh_token,
+          user
+      }
+  }
 
   @Post('signout')
-  async logout(@GetToken() token: string): Promise<{ }> {
+  async logout(@GetToken() token: string): Promise<{ accestoken: string, refreshToken: string, message: string }> {
     console.log(token)
- 
+
       if (!token) {
             throw new UnauthorizedException('Access denied: Token not found');
         }
@@ -170,32 +169,7 @@ export class UserController {
           message: 'Vous avez bien été déconnecté'
       }
   }
-//   private extractTokenFromHeader(request: Request): string | undefined {
-//     const [type, token] = request.headers.auth ?.split(' ') ?? [];
-//     return type === 'Bearer' ? token : undefined;
-// }
 
-  // //FIXME: //?USER ?
-  // @UseGuards(AuthRefreshGuard)
-  // @Get('refresh_token')
-  // async refreshTokens(
-  //     @Req() req: Request
-  // ): Promise<{ access_token: string, refresh_token: string, user: User }> {
-  //     const user = await this.userService.findByRefreshToken(req.refreshToken)
-  //     if (!user) throw new UnauthorizedException('server error')
-
-  //     const refresh_token = await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '8h' })
-  //     this.userService.update({ id: user.id }, { refreshToken: refresh_token })
-  //     delete user.password
-  //     delete user.refreshToken
-  //     return {
-  //         access_token: await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_SECRET, expiresIn: '20m' }),
-  //         refresh_token,
-  //         user
-  //     }
-  // }
-
-// trouver user by id
   @Get(':id')
   async readRoute(
       @Param('id') id: string,
@@ -227,5 +201,3 @@ export class UserController {
         };
   }
 }
-
-   
