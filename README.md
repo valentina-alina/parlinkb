@@ -32,6 +32,20 @@
 $ npm install
 ```
 
+## env
+
+````bash
+PORT=<NUMBER> #listen port of the application
+DATABASE_URL="mysql://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>"
+JWT_SECRET=<STRING>
+JWT_REFRESH_TOKEN=<STRING>
+REDIS_HOST=<STRING>
+REDIS_PORT=<NUMBER>
+WORK_DIR=/usr/<APP_ROOT>
+LOCALHOST_URL="http://<DOMAIN_NAME>:<APP_PORT>"
+IPV4_URL="http://<IPV4_ADDRESS>:<APP_PORT>"
+````
+
 ## Running the app
 
 ```bash

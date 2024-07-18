@@ -7,12 +7,10 @@ WORKDIR /usr/app
 
 # Install app dependencies using the `npm ci` command.
 # This command uses package-lock.json to install dependencies.
-COPY package*.json ./
-RUN npm install
+COPY package.json ./
 
-# Install bcrypt explicitly
-RUN npm install bcrypt
-RUN npm install -D @types/bcrypt
+# Install the dependencies
+RUN npm install
 
 # Copy the app files to the container.
 COPY . .
@@ -20,12 +18,8 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
-# Install Prisma CLI for migrations
-RUN npm install -g prisma
-
-# Expose the port the app runs on
-ENV SERVER_PORT 3000
-EXPOSE $SERVER_PORT
+# Build the application => TJ => JS
+RUN npm run build
 
 # Start the app
-CMD [ "npm", "run", "start:dev" ]
+CMD [ "npm", "run", "start:prod" ]

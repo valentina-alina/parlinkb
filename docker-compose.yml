@@ -1,21 +1,20 @@
 services:
   mariadb:
-    image: mariadb:latest
+    image: mariadb:11.2.4
     container_name: mariadb
     platform: linux/amd64
     environment:
       MYSQL_DATABASE: back
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    ports:
-      - "3307:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
 
   phpmyadmin:
-    image: phpmyadmin:latest
-    container_name: phpmyadmin
+    image: phpmyadmin:5.2.1
+    container_name: phpymyadmin
     environment:
-      PMA_HOST: mariadb
+      APACHE_SERVER_NAME: localhost
+      PMA_HOST: ${PMA_HOST}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "8080:80"
@@ -27,9 +26,15 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
 
   mysql-client:
-    image: mysql:latest
+    image: mysql:8.0
     container_name: mysql-client
     command: tail -f /dev/null
     depends_on:
@@ -37,12 +42,14 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
 
-  nestjs:
-    build: .
-    image: nestjs:v1
-    container_name: nestjs
+  back:
+    image: registry.alt-tools.tech/aquildev/projet-ecole/back:test
+    container_name: back
     environment:
+      PORT: ${PORT}
       DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_TOKEN: ${JWT_REFRESH_TOKEN}
       REDIS_HOST: redis
       REDIS_PORT: 6379
     ports:
@@ -50,16 +57,6 @@ services:
     depends_on:
       - mariadb
       - redis
-    develop:
-      watch:
-        - action: sync
-          path: ./
-          target: /${WORK_DIR}
-          ignore:
-            - node_modules
-        - action: rebuild
-          path: package.json
 
 volumes:
   mariadb_data:
-    driver: local
