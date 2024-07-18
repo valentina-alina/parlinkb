@@ -120,7 +120,7 @@ export class UserController {
   }
 
   @UseGuards(AuthRefreshGuard)
-  @Get('refresh_token')
+  @Post('refresh_token')
   async refreshTokens(
       @Req() req: Request
   ): Promise<{ access_token: string, refresh_token: string, user: User }> {
