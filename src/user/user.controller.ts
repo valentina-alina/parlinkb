@@ -43,7 +43,7 @@ import { AdminGuard } from "../guards/admin.jwt.guards";
 // import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
 import { jwtPayloadDto } from "../guards/jwtPayload.dto"
-import { AuthRefreshGuard } from "src/guards/refresh.jwt.guards";
+import { AuthRefreshGuard } from "../guards/refresh.jwt.guards";
 
 interface Request extends ExpressRequest {
   user?: { sub: number, email: string };
