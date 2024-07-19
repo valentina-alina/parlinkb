@@ -51,7 +51,7 @@ services:
 
   back:
     image: registry.alt-tools.tech/aquildev/projet-ecole/back:test
-    container_name: back
+    container_name: nestjs
     environment:
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL}
