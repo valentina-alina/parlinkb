@@ -49,7 +49,7 @@ services:
     networks:
       - backend-network
 
-  back:
+  nestjs:
     image: registry.alt-tools.tech/aquildev/projet-ecole/back:test
     container_name: nestjs
     environment:
