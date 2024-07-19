@@ -1,6 +1,6 @@
 services:
   mariadb:
-    image: mariadb:11.2.4
+    image: mariadb:11.2
     container_name: mariadb
     platform: linux/amd64
     environment:
@@ -8,30 +8,32 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
+    networks:
+      - backend-network
 
   phpmyadmin:
-    image: phpmyadmin:5.2.1
-    container_name: phpymyadmin
+    image: phpmyadmin:5.2-fpm-alpine
+    container_name: phpmyadmin
     environment:
       APACHE_SERVER_NAME: localhost
-      PMA_HOST: ${PMA_HOST}
+      PMA_HOST: mariadb
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "8080:80"
     depends_on:
       - mariadb
+    networks:
+      - backend-network
 
   redis:
-    image: redis:latest
+    image: redis:7.2-alpine
     container_name: redis
     ports:
       - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 5s
+    networks:
+      - backend-network
+    volumes:
+      - redis_data:/data
 
   mysql-client:
     image: mysql:8.0
@@ -41,13 +43,15 @@ services:
       - mariadb
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    networks:
+      - backend-network
 
   back:
     image: registry.alt-tools.tech/aquildev/projet-ecole/back:test
     container_name: back
     environment:
-      PORT: ${PORT}
-      DATABASE_URL: ${DATABASE_URL}
+      PORT: 3000
+      DATABASE_URL: mysql://root:pass_word@mariadb:3306/back
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_TOKEN: ${JWT_REFRESH_TOKEN}
       REDIS_HOST: redis
@@ -57,6 +61,12 @@ services:
     depends_on:
       - mariadb
       - redis
+    networks:
+      - backend-network
 
 volumes:
   mariadb_data:
+  redis_data:
+
+networks:
+  backend-network:
