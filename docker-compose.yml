@@ -2,21 +2,24 @@ services:
   mariadb:
     image: mariadb:11.2
     container_name: mariadb
-    platform: linux/amd64
     environment:
-      MYSQL_DATABASE: back
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - ./mariadb_data:/var/lib/mysql
     networks:
       - backend-network
 
   phpmyadmin:
-    image: phpmyadmin:5.2-fpm-alpine
+    image: phpmyadmin
     container_name: phpmyadmin
     environment:
       APACHE_SERVER_NAME: localhost
-      PMA_HOST: mariadb
+      PMA_HOST: ${PMA_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "8080:80"
@@ -51,7 +54,7 @@ services:
     container_name: back
     environment:
       PORT: 3000
-      DATABASE_URL: mysql://root:pass_word@mariadb:3306/back
+      DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_TOKEN: ${JWT_REFRESH_TOKEN}
       REDIS_HOST: redis
@@ -65,7 +68,7 @@ services:
       - backend-network
 
 volumes:
-  mariadb_data:
+  # mariadb_data:
   redis_data:
 
 networks:
