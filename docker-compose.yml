@@ -29,7 +29,7 @@ services:
       - backend-network
 
   redis:
-    image: redis:7.2-alpine
+    image: redis:alpine
     container_name: redis
     ports:
       - "6379:6379"
