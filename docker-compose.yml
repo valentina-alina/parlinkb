@@ -50,7 +50,7 @@ services:
       - backend-network
 
   nestjs:
-    image: registry.alt-tools.tech/aquildev/projet-ecole/back:test
+    image: registry.alt-tools.tech/aquildev/projet-ecole/back:devops
     container_name: nestjs
     environment:
       PORT: 3000
