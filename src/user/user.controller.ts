@@ -50,6 +50,11 @@ interface Request extends ExpressRequest {
   refreshToken: string;
 }
 
+interface getByIdResponse{
+  firstName: string;
+  lastName:string;
+} 
+
 @UseGuards(AuthGuard)
 // @UseGuards(AuthRefreshGuard)
 @Controller('user')
@@ -170,22 +175,6 @@ export class UserController {
       }
   }
 
-  @Get(':id')
-  async readRoute(
-      @Param('id') id: string,
-  ): Promise<{user: User, message: string}> {
-  
-    const user = await this.userService.findByUnique({ id });
-
-    if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
-    
-    const message = `Utilisateur avec l\'id ${id}`;
-    return {
-      user,
-      message
-    };
-  }
-
   @Get()
   async getUsersWithDetails(@Query() query: { skip?: string; take?: string }): Promise<{ users :any[], message :string }> {
     const prismaOptions: Prisma.UserFindManyArgs = {};
@@ -200,4 +189,27 @@ export class UserController {
           message
         };
   }
+
+  @Get(':id')
+  async readRoute(
+      @Param('id') id: string,
+  ): Promise<{data: getByIdResponse, message: string}> {
+
+    const user = await this.userService.findByUnique({ id });
+
+    const data = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+        };
+
+
+    if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
+
+    const message = 'Utilisateur avec l\'id ${id}';
+    return {data,
+      message
+    };
+  }
+
+  
 }

@@ -5,7 +5,6 @@ import { Prisma, User } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PRISMA_ERRORS } from '../../prisma/prisma.errors';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -18,7 +17,7 @@ export class UserService {
   // }
   async create(data: CreateUserDto): Promise<User> {
     console.log(data);
- 
+
     const user = await this.prisma.user.create(
       {data: {role : data.role, firstName : data.firstName, lastName: data.lastName, email :data.email, password:data.password}}
     );
