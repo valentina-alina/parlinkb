@@ -28,7 +28,7 @@ async canActivate(context: ExecutionContext): Promise<boolean> {
     console.log('payload', payload)
     // 💡 We're assigning the payload to the request object here
     // so that we can access it in our route handlers
-    request['refreshToken'] = token;
+    request['refresh_token'] = token;
     } catch(error) {
     throw new UnauthorizedException(error);
     }

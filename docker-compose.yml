@@ -59,6 +59,8 @@ services:
       JWT_REFRESH_TOKEN: ${JWT_REFRESH_TOKEN}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      LOCALHOST_URL: http://localhost:5173
+      IPV4_URL: http://192.168.1.75:5173
     ports:
       - "3000:3000"
     depends_on:
@@ -73,3 +75,4 @@ volumes:
 
 networks:
   backend-network:
+    external: true
