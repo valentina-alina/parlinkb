@@ -136,7 +136,8 @@ export class UserService {
   async deleteByUserId(userId: string): Promise<{ message: string }> {
     try {
       await this.prisma.user.delete({
-        where: { id: userId
+        where: {
+          id: userId
         }
       });
       const message = 'UserHasSubject records deleted for user ID';
@@ -148,8 +149,8 @@ export class UserService {
           : `Unexpected error: ${error.message}`;
         return { message: errorMessage };
       }
-      const message = `Unexpected error: ${error.message}`;
-      return { message: message };
+      return {
+        message: `Unexpected error: ${error.message}`,
+      };
     }}
- 
   }

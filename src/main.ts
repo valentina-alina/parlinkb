@@ -24,7 +24,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [localhostUrl,ipv4Url],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization','refresh_token'],
     credentials: true,
   });
   console.log('CORS configuré');

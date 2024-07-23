@@ -1,10 +1,13 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpStatus, HttpException, Res } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpStatus, HttpException, Res, UseGuards } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { Prisma, Subject } from '@prisma/client';
+import { AuthGuard } from '../guards/jwt.guards';
 
+@UseGuards(AuthGuard)
 @Controller('subject')
 export class SubjectController {
   private readonly dataName = 'subject';
@@ -14,13 +17,11 @@ export class SubjectController {
   @Post()
   async create(@Body() inputDto: CreateSubjectDto): Promise<{ [key: string]: Subject | string }> {
     const out = await this.service.create(inputDto);
-    const message = `New subject was created`;
     return {
       [this.dataName]: out,
-      message
+      message: `New subject was created`,
     };
   }
-
 
   @Get()
   async findAllByParams(@Query() query: { skip?: string, take?: string, name?: string }): Promise<{ [key: string]: Subject[] | string }> {
@@ -41,22 +42,19 @@ export class SubjectController {
     }
 
     const out = await this.service.findAllByParams(prismaOptions);
-    const message = `All subjects`;
     return {
       [this.dataName]: out,
-      message
+      message: `All subjects`,
     };
   }
+
   @Get('')
   async findByName(@Query('name') subName: string, @Res() res: Response) {
-    
-
     const result = await this.service.findByUnique({name: subName
     });
 
     return result
   }
-
 
   @Get(':id')
   async readRoute(@Param('id') id: string): Promise<{ [key: string]: Subject | string }> {
@@ -64,23 +62,20 @@ export class SubjectController {
 
     if (!out) throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.CONFLICT);
     
-    const message = `Subject avec l'id ${id}`;
     return {
       [this.dataName]: out,
-      message
+      message: `Subject avec l'id ${id}`,
     };
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() inputDto: UpdateSubjectDto): Promise<{ [key: string]: Subject | string }> {
     const out = await this.service.update({ id }, inputDto);
-    const message = `Subject avec l'id ${id} a été mis à jour`;
     return {
       [this.dataName]: out,
-      message
+      message: `Subject avec l'id ${id} a été mis à jour`,
     };
   }
-
 
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<{ subject?: Subject; message: string }> {
@@ -97,8 +92,9 @@ export class SubjectController {
       throw new HttpException(result, HttpStatus.CONFLICT);
     }
 
-    const message = `Subject avec l'id ${id} a été supprimé`;
-    return { subject: result, message };
+    return {
+      subject: result,
+      message: `Subject avec l'id ${id} a été supprimé`,
+    };
   }
 }
-

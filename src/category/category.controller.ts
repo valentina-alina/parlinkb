@@ -4,7 +4,8 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from '@prisma/client';
-
+import { AuthGuard } from '../guards/jwt.guards';
+import { UseGuards } from '@nestjs/common';
 
 //TODO: CREATE CATEGORY | SUBCATEGORY
 //TODO: READ ALL CATEGORIES | SUBCATEGORIES
@@ -13,6 +14,7 @@ import { Category } from '@prisma/client';
 //TODO: UPDATE CATEGORIES | SUBCATEGORIES
 //TODO: DELETE CATEGORIES | SUBCATEGORIES
 
+@UseGuards(AuthGuard)
 @Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}

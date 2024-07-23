@@ -4,7 +4,10 @@ import { SubCategoryService } from './subCategory.service';
 import { CreateSubCategoryDto } from './dto/create-subCategory.dto';
 import { UpdateSubCategoryDto } from './dto/update-subCategory.dto';
 import { SubCategory } from '@prisma/client';
+import { AuthGuard } from '../guards/jwt.guards';
+import { UseGuards } from '@nestjs/common';
 
+@UseGuards(AuthGuard)
 @Controller('subCategories')
 export class SubCategoryController {
 
@@ -31,7 +34,7 @@ export class SubCategoryController {
   async findAll(): Promise<{ subCategories: string[], message: string }> {
     const subCategories = await this.subCategoryService.findAllSubCategoryNames();
 
-    if (!subCategories) throw new HttpException('La liste de sous-catégories n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if (!subCategories) throw new HttpException('La liste des sous-catégories n\'a pas été trouvée', HttpStatus.CONFLICT)
 
     return {
       subCategories,
@@ -63,7 +66,7 @@ export class SubCategoryController {
 
     return {
       subCategory,
-      message: `Subcatégorie ${name}`
+      message: `Sous-catégorie ${name}`
     };
   } 
 

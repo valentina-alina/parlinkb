@@ -20,7 +20,7 @@ export class AdminGuard implements CanActivate {
         const token = this.extractTokenFromHeader(request);
 
         if (!token) {
-            throw new UnauthorizedException('Access denied: Token not found');
+            throw new UnauthorizedException('Accès refusé: Token non trouvé');
         }
 
         let tokenDecode: jwtPayloadDto;
@@ -28,12 +28,12 @@ export class AdminGuard implements CanActivate {
         try {
             tokenDecode = jwtDecode<jwtPayloadDto>(token);
         } catch (error) {
-            throw new UnauthorizedException('Invalid token');
+            throw new UnauthorizedException('Token invalide');
         }
 
         if (tokenDecode.role !== 'admin') {
-            console.log('role=', tokenDecode.role, 'is not admin:', tokenDecode.role !== 'admin');
-            throw new UnauthorizedException('Access denied: Admins only');
+            
+            throw new UnauthorizedException('Accès refusé: Admin');
         }
 
         try {
@@ -42,7 +42,7 @@ export class AdminGuard implements CanActivate {
             });
             request['user'] = payload;
         } catch (error) {
-            throw new UnauthorizedException('Invalid token');
+            throw new UnauthorizedException('Token invalide');
         }
 
         return true;

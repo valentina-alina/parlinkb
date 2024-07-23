@@ -10,26 +10,17 @@ import {
   UseGuards,
   Param,
   Query,
-  Req,
-  /* Put,
-  Req,
-  Delete,
-  ExecutionContext */
 } from "@nestjs/common";
 import { AuthService } from "../auth/auth.service";
 import { UserService } from '../user/user.service';
-
-// import { Request as ExpressRequest } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { GetToken } from '../guards/getToken.decorator' 
 import { jwtDecode } from 'jwt-decode';
 // import * as bcrypt from 'bcrypt';
 // import { randomBytes } from 'crypto';
-// import { AuthRefreshGuard } from '../../src/guards/refresh.jwt.guards';
 // import { Child} from "@prisma/client";
 import { CustomException } from "../../src/exceptions/custom.exception";
 import { RegisterUserDto } from "../user/dto/register-user.dto";
-import { Request as ExpressRequest } from 'express';
 
 import { SubjectService } from "../subject/subject.service";
 import { ChildService } from "../child/child.service";
@@ -45,18 +36,13 @@ import { Prisma, User } from '@prisma/client';
 import { jwtPayloadDto } from "../guards/jwtPayload.dto"
 import { AuthRefreshGuard } from "../guards/refresh.jwt.guards";
 
-interface Request extends ExpressRequest {
-  user?: { sub: number, email: string };
-  refreshToken: string;
-}
-
 interface getByIdResponse{
   firstName: string;
   lastName:string;
 } 
 
 @UseGuards(AuthGuard)
-// @UseGuards(AuthRefreshGuard)
+@UseGuards(AuthRefreshGuard)
 @Controller('user')
 export class UserController {
   constructor(
@@ -124,28 +110,8 @@ export class UserController {
       }
   }
 
-  @UseGuards(AuthRefreshGuard)
-  @Post('refresh_token')
-  async refreshTokens(
-      @Req() req: Request
-  ): Promise<{ access_token: string, refresh_token: string, user: User }> {
-    const user = await this.userService.findByRefreshToken(req.refreshToken)
-    if (!user) throw new UnauthorizedException('server error')
-
-    const refresh_token = await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '8h' })
-    await this.userService.update({ id: user.id }, { refreshToken: refresh_token });
-
-    delete user.password
-    delete user.refreshToken
-    return {
-        access_token: await this.jwtService.signAsync({ sub: user.id, email: user.email }, { secret: process.env.JWT_SECRET, expiresIn: '20m' }),
-        refresh_token,
-        user
-    }
-  }
-
   @Post('signout')
-  async logout(@GetToken() token: string): Promise<{ accestoken: string, refreshToken: string, message: string }> {
+  async logout(@GetToken() token: string): Promise<{ access_token: string, refresh_token: string, message: string }> {
     console.log(token)
 
       if (!token) {
@@ -161,16 +127,16 @@ export class UserController {
         }
       const userId = tokenDecode.userId;
       const user = await this.userService.findByUnique({ id: userId })
-      if (!user) throw new HttpException('Erreur: user non trouvé', HttpStatus.CONFLICT)
+      if (!user) throw new HttpException('Erreur: utilisateur non trouvé', HttpStatus.CONFLICT)
         
-        const payload = { userId: "", role: "" }
-        const access_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '20m' })
+        /* const payload = { userId: "", role: "" } */
+        /* const access_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '20m' }) */
 
         // const refresh_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '7d' });
         
       this.userService.update({ id: user.id }, { refreshToken: '' })
-      return {accestoken : access_token,
-        refreshToken: '',
+      return {access_token : '',
+        refresh_token: '',
           message: 'Vous avez bien été déconnecté'
       }
   }
@@ -182,11 +148,10 @@ export class UserController {
     if (query.take) prismaOptions.take = +query.take;
 
     const users = await this.userService.getUsersWithDetails(prismaOptions);
-    const message = 'All users with details';
 
     return {
           users,
-          message
+          message: `All users with details`,
         };
   }
 
@@ -200,16 +165,12 @@ export class UserController {
     const data = {
       firstName: user.firstName,
       lastName: user.lastName,
-        };
-
+    };
 
     if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
 
-    const message = 'Utilisateur avec l\'id ${id}';
     return {data,
-      message
+      message: `Utilisateur avec l'id ${id}`,
     };
   }
-
-  
 }

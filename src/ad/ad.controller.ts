@@ -31,7 +31,6 @@ export class AdController {
   ) {}
 
   @Post()
-  @UseGuards(AuthGuard)
   async create(@Body() data: CreateAdDto): Promise<{ ad: Ad, message: string}> {
     const user = await this.userService.findByUnique({id : data.userId})
       if (!user) throw new HttpException(`L'utilisateur n'existe pas`, HttpStatus.CONFLICT)
@@ -62,10 +61,7 @@ export class AdController {
     }
   }
 
-
-
   @Get()
-
   async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<{ads: Ad[], message: string}> {
     const new_options: Prisma.AdFindManyArgs = {}
     options.skip? new_options.skip = +options.skip : null
