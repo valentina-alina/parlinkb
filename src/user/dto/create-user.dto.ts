@@ -30,7 +30,6 @@ export class CreateUserDto {
     @ApiProperty({ required: true })
     email: string;
 
-   
     @IsString()
     @MinLength(4, { message: 'Le mot de passe doit comporter plus 4 caractères'})
     @MaxLength(20, { message: 'Le mot de passe doit comporter moins de 20 caractères'})
