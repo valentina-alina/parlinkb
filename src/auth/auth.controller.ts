@@ -28,7 +28,7 @@ import { User, UserRole } from "@prisma/client";
 
 import { CustomException } from "../../src/exceptions/custom.exception";
 import { AuthRefreshGuard } from "../guards/refresh.jwt.guards";
-import { GetToken } from "src/guards/getToken.decorator";
+import { GetToken } from "../guards/getToken.decorator";
 
 // TODO envoyer mail avec l'id de l'admin crée dans un jwttoken
 
