@@ -5,6 +5,7 @@ import { Ad, Prisma, UserHasAds } from '@prisma/client';
 // import { UpdateAdDto } from './dto/update-ad.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
+import { AdCreateForeignKeyInterface, AdCreateInputInterface } from './interface/ad.interface';
 // import { GetAdsUserDto } from './dto/get-ads-user.dto';
 
 @Injectable()
@@ -12,9 +13,14 @@ export class AdService {
 
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.AdCreateInput): Promise<Ad> {
-    return this.prisma.ad.create({
-        data,
+  async create(data: AdCreateInputInterface, foreignKeys: AdCreateForeignKeyInterface): Promise<Ad> {
+    return await this.prisma.ad.create({
+      data: {
+        ...data,
+        users: { connect: { id: foreignKeys.userId } },
+        category: { connect: { id: foreignKeys.categoryId } },
+        subCategory: { connect: { id: foreignKeys.subCategoryId } },
+        }
     })
   }
 
@@ -23,7 +29,7 @@ export class AdService {
   }
 
   async findAllByParams(options: Prisma.AdFindManyArgs): Promise<Ad[]>{
-    return this.prisma.ad.findMany(options);
+    return this.prisma.ad.findMany(options); // SELECT???
   }
 
   async findAllByFilters(query: string): Promise<Ad[]>{
@@ -64,11 +70,11 @@ export class AdService {
     })
   }
 
-  async findAllByUser(query: string): Promise<Ad[]>{
+  async findAllByUser(userId: string): Promise<Ad[]>{
     return this.prisma.ad.findMany({
       where: {
         users: {
-          id: query
+          id: userId
         }
       }
     })
@@ -78,6 +84,14 @@ export class AdService {
     adWhereUniqueInput: Prisma.AdWhereUniqueInput
   ): Promise<Ad | null> {
     return this.prisma.ad.findUnique({
+      where: adWhereUniqueInput
+    });
+  }
+
+   async exist(
+    adWhereUniqueInput: Prisma.AdWhereUniqueInput
+  ): Promise<boolean> {
+    return !!await this.prisma.ad.count({
       where: adWhereUniqueInput
     });
   }

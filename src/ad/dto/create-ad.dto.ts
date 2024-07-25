@@ -20,17 +20,17 @@ export class CreateAdDto {
     @IsOptional()
     duration?: number;
 
-    @IsOptional()
-    address?: string;
+    @IsNotEmpty()
+    address: string;
 
-    @IsOptional()
-    postalCode?: string;
+    @IsNotEmpty()
+    postalCode: string;
 
-    @IsOptional()
-    city?: string;
+    @IsNotEmpty()
+    city: string;
 
-    @IsOptional()
-    country?: string;
+    @IsNotEmpty()
+    country: string;
 
     @IsOptional()
     attendees?: number;
@@ -49,11 +49,11 @@ export class CreateAdDto {
     @IsNotEmpty()
     userId: string;
 
-    @IsOptional()
-    categoryId?: string;
+    @IsNotEmpty()
+    categoryId: string;
 
-    @IsOptional()
-    subCategoryId?: string;
+    @IsNotEmpty()
+    subCategoryId: string;
 
     @IsOptional()
     adHasFile?: null; 

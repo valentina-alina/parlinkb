@@ -19,7 +19,11 @@ export class UserService {
     console.log(data);
 
     const user = await this.prisma.user.create(
-      {data: {role : data.role, firstName : data.firstName, lastName: data.lastName, email :data.email, password:data.password}}
+      {
+        data: {
+          role: data.role, firstName: data.firstName, lastName: data.lastName, email: data.email, password: data.password
+        }
+      }
     );
 
     return user;
@@ -39,6 +43,10 @@ export class UserService {
         password: password
       },
     });
+  }
+
+  async exist(id: string): Promise<boolean> {
+    return !!await this.prisma.user.count({ where: { id } })
   }
 
   async findByUnique(

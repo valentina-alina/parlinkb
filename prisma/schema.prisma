@@ -112,7 +112,7 @@ model Ad {
   updatedAt  DateTime?  @default(now()) @updatedAt
   userId     String     @db.VarChar(191)
   categoryId String     @db.VarChar(191)
-  subCategoryId String  @db.VarChar(191) @default("test")
+  subCategoryId String  @db.VarChar(191) 
   users      User       @relation(fields: [userId], references: [id])
   category   Category   @relation(fields: [categoryId], references: [id])
   subCategory SubCategory @relation(fields: [subCategoryId], references: [id])

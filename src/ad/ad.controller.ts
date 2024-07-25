@@ -9,6 +9,9 @@ import { AuthGuard } from '../guards/jwt.guards';
 import { GetAdsFilterDto } from './dto/get-ads-filter.dto';
 import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
 import { GetAdsUserDto } from './dto/get-ads-user.dto';
+import { PaginatorQueryInterface } from 'src/interfaces/paginator';
+import { ResponseAdPromiseInterface, ResponseAdsPromiseInterface } from './interface/response.interface';
+import { responseCode } from 'src/utils/response.utils';
 
 
 //? ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
@@ -28,79 +31,34 @@ export class AdController {
   constructor(
     private readonly adService: AdService,
     private readonly userService: UserService,
-  ) {}
-
-  @Post()
-  async create(@Body() data: CreateAdDto): Promise<{ ad: Ad, message: string}> {
-    const user = await this.userService.findByUnique({id : data.userId})
-      if (!user) throw new HttpException(`L'utilisateur n'existe pas`, HttpStatus.CONFLICT)
-
-    const new_ad =  await this.adService.create({
-      title: data.title,
-      description: data.description,
-      startTime: data.startTime,
-      endTime: data.endTime,
-      duration: data.duration,
-      address: data.address,
-      postalCode: data.postalCode,
-      city: data.city,
-      country: data.country,
-      attendees: data.attendees,
-      transport: data.transport,
-      conform: data.conform,
-      status: data.status,
-      adPicture: data.adPicture,
-      users: { connect: { id: data.userId } },
-      category: { connect: { id: data.categoryId } },
-      subCategory: { connect: { id: data.subCategoryId } },
-    });
-
-    return {
-      ad: new_ad,
-      message: `L'annonce a bien été créée`
-    }
-  }
+  ) { }
+  
 
   @Get()
-  async findAllByParams(@Query() options: {skip?: string, take?: string }): Promise<{ads: Ad[], message: string}> {
-    const new_options: Prisma.AdFindManyArgs = {}
-    options.skip? new_options.skip = +options.skip : null
-    options.take? new_options.take = +options.take : null
-
-    /* skip: options.skip ? +options.skip: 0,
-    take: options.take ? +options.take: 6, */
-
-    const ads = await this.adService.findAllByParams(new_options)
-
+  async findAll(@Query() options: PaginatorQueryInterface): ResponseAdsPromiseInterface{
     return {
-      ads,
-      message: `Liste d'annonces filtrées`
-    };
+      ads: await this.adService.findAllByParams(options),
+      message: responseCode().success.event.filter
+    }
   }
 
   @Get('params')
   async findAllByFilters(
     @Query() {search}: GetAdsFilterDto,
-  ): Promise<{ads: Ad[], message: string}> {
-
-    const ads = await this.adService.findAllByFilters(search)
-
+  ): ResponseAdsPromiseInterface {
     return {
-      ads,
-      message: `Liste d'annonces filtrées`
+      ads: await this.adService.findAllByFilters(search),
+      message:  responseCode().success.event.filter
     };
   }
 
   @Get('categories')
   async findAllByCategories(
     @Query() categoryParams: GetAdsCategoryDto,
-  ): Promise<{ads: Ad[], message: string}> {
-
-    const ads = await this.adService.findAllByCategories(categoryParams)
-
+  ): ResponseAdsPromiseInterface {
     return {
-      ads,
-      message: `Liste d'annonces filtrées`
+      ads: await this.adService.findAllByCategories(categoryParams),
+      message:  responseCode().success.event.filter
     };
   }
 
@@ -108,60 +66,75 @@ export class AdController {
   async findAllByUser(
     @Query() {id}: GetAdsUserDto,
   ): Promise<{userAds: Ad[], message: string}> {
-
-    const userAds = await this.adService.findAllByUser(id)
-
     return {
-      userAds,
-      message: `Liste d'annonces de l'utilisateur`
+      userAds: await this.adService.findAllByUser(id),
+      message:responseCode().success.event.filterUser
     };
   }
 
   @Get(':id')
   async readRoute(
       @Param('id') id: string,
-  ): Promise<{ ad: Ad, message: string}> {
-  
-    const ad = await this.adService.findByUnique({ id });
-
-    if (!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
-
+  ): ResponseAdPromiseInterface {
+  try {
     return {
-      ad,
-      message: `Annonce avec l'id ${id}`
+      ad: await this.adService.findByUnique({ id }),
+      message: responseCode(id).success.event.byId
     };
+  } catch (error) {
+   throw new HttpException(responseCode(id).error.event.byId, HttpStatus.NOT_FOUND)  
+  }
+   
+  }
+
+
+  @Post()
+  async create(@Body() data: CreateAdDto): ResponseAdPromiseInterface {
+    try {
+      if (!await this.userService.exist(data.userId)) throw new HttpException(responseCode(data.userId).error.event.user, HttpStatus.CONFLICT)
+  
+      const { userId, categoryId, subCategoryId, ...datas } = data;
+      return {
+        ad:  await this.adService.create(datas, {userId, categoryId, subCategoryId}),
+        message: responseCode().success.event.create
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 
   @Put(':id')
   async updateRoute(
       @Param('id') id: string,
       @Body() adUpdateDto: UpdateAdDto,
-  ): Promise<{ad: Ad, message: string}> {
-      const ad = await this.adService.findByUnique({ id });
-      
-      if (!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
-
-      const adUpdate = await this.adService.update({ id }, adUpdateDto);
-
+  ): ResponseAdPromiseInterface {
+    try {
       return {
-        ad: adUpdate,
-        message: `L'annonce avec l'id ${id} a bien été mise à jour`
+        ad:  await this.adService.update({ id }, adUpdateDto),
+        message: responseCode().success.event.update
       }
+    } catch (error) {
+      throw new HttpException(responseCode(id).error.event.update, HttpStatus.NOT_FOUND)  
+    }
+     
   }
 
   @Delete(':id')
-  async deleteRoute(@Param('id') id: string,): Promise<Ad | { message: string }> {
+  async deleteRoute(@Param('id') id: string): Promise<{ message: string }> {
 
-    const ad = await this.adService.findByUnique({ id })
-
-    if(!ad) throw new HttpException('L\'annonce n\'a pas été trouvée', HttpStatus.CONFLICT)
-
-    this.adService.delete({ id });
-
+    const ad = await this.adService.delete({ id });
+    if(!ad) throw new HttpException(responseCode(id).error.event.delete, HttpStatus.CONFLICT)
     return {
-      message: `L'annonce avec l'id ${id} a bien été supprimée`
+      message: responseCode(id).success.event.delete
     }
   }
+
+
+/**
+ * ************************
+ *    SUBSCRIBE PART
+ * ************************
+ */
 
   @Post('subscribe/:id')
   async subscribeUserToAd(
