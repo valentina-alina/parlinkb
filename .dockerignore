@@ -5,3 +5,6 @@ README.md
 .vscode
 LICENSE
 npm-debug.log*
+.env
+/redis_data
+/mariadb_data

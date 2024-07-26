@@ -4,6 +4,8 @@
 /build
 /prisma/migrations
 /prisma/schema_old.prisma
+/redis_data
+/mariadb_data
 
 # Logs
 logs

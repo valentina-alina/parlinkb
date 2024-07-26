@@ -1,18 +1,44 @@
 services:
+  front-prod:
+    image: registry.alt-tools.tech/aquildev/projet-ecole/front:devops
+    ports:
+      - 4578:80
+    networks:
+      - internet
+      
+  nestjs:
+    image: registry.alt-tools.tech/aquildev/projet-ecole/back:devops
+    container_name: nestjs
+    environment:
+      PORT: 3000
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_TOKEN: ${JWT_REFRESH_TOKEN}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      LOCALHOST_URL: ${LOCALHOST_URL}
+      IPV4_URL: ${IPV4_URL}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mariadb
+      - redis
+    networks:
+      - redis_network
+      - db_network
+      - internet
+
   mariadb:
     image: mariadb:11.2
-    container_name: mariadb
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    ports:
-      - "3307:3306"
     volumes:
       - ./mariadb_data:/var/lib/mysql
     networks:
-      - backend-network
+      - db_network
 
   phpmyadmin:
     image: phpmyadmin
@@ -28,53 +54,20 @@ services:
     depends_on:
       - mariadb
     networks:
-      - backend-network
+      - db_network
+      - internet
 
   redis:
     image: redis:7.2-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
     networks:
-      - backend-network
+      - redis_network
     volumes:
       - redis_data:/data
 
-  mysql-client:
-    image: mysql:8.0
-    container_name: mysql-client
-    command: tail -f /dev/null
-    depends_on:
-      - mariadb
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    networks:
-      - backend-network
-
-  nestjs:
-    image: registry.alt-tools.tech/aquildev/projet-ecole/back:devops
-    container_name: nestjs
-    environment:
-      PORT: 3000
-      DATABASE_URL: ${DATABASE_URL}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_REFRESH_TOKEN: ${JWT_REFRESH_TOKEN}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      LOCALHOST_URL: http://localhost:5173
-      IPV4_URL: http://192.168.1.75:5173
-    ports:
-      - "3000:3000"
-    depends_on:
-      - mariadb
-      - redis
-    networks:
-      - backend-network
-
 volumes:
-  # mariadb_data:
   redis_data:
 
 networks:
-  backend-network:
-    external: true
+  redis_network: 
+  internet:
+  db_network:
