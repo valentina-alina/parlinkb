@@ -54,5 +54,4 @@ async function bootstrap() {
   await app.listen(process.env.PORT, '0.0.0.0');
   console.log('L\'application NestJS écoute sur le port 3000.');
 }
-
 bootstrap();
