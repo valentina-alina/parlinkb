@@ -14,6 +14,9 @@ COPY package.json ./
 # Install the dependencies
 RUN npm install
 
+# Copy the Prisma schema and migrations separately if needed
+COPY prisma ./prisma
+
 # Copy the app files to the container.
 COPY . .
 
