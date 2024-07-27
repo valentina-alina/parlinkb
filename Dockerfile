@@ -1,8 +1,8 @@
 # Use the official Node.js image.
 # https://hub.docker.com/_/node
 FROM node:20.15.1-slim
-RUN apt-get update -y
-RUN apt-get install -y openssl
+RUN apt-get update -y && \
+    apt-get install -y openssl
 
 # Create and change to the app directory.
 WORKDIR /usr/app
