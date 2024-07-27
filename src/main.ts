@@ -20,9 +20,10 @@ async function bootstrap() {
 
   const localhostUrl = process.env.LOCALHOST_URL;
   const ipv4Url = process.env.IPV4_URL;
+  const vercelUrl = process.env.VERCEL_URL;
 
   app.enableCors({
-    origin: [localhostUrl,ipv4Url],
+    origin: [localhostUrl,ipv4Url,vercelUrl],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization','refresh_token'],
     credentials: true,
@@ -50,7 +51,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   console.log('Documentation Swagger documentation configurée.');
-  await app.listen(3000, '0.0.0.0');
+  await app.listen(process.env.PORT, '0.0.0.0');
   console.log('L\'application NestJS écoute sur le port 3000.');
 }
 bootstrap();
