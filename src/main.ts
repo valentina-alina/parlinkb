@@ -51,7 +51,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   console.log('Documentation Swagger documentation configurée.');
-  await app.listen(process.env.PORT, '0.0.0.0');
+  await app.listen(process.env.PORT || 3000);
   console.log('L\'application NestJS écoute sur le port 3000.');
 }
 bootstrap();
