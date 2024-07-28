@@ -98,28 +98,33 @@ export class AuthController {
         @Body() data: LoginUserDto
     ): Promise<{ access_token: string, refresh_token: string, message: string }> {
 
-        const user = await this.userService.findByUnique({ email: data.email})
+        try {
+            const user = await this.userService.findByUnique({ email: data.email})
 
-        if (!user) throw new HttpException('Erreur: identifiants incorrects', HttpStatus.UNAUTHORIZED);
+            if (!user) throw new HttpException('Erreur: identifiants incorrects', HttpStatus.UNAUTHORIZED);
 
-        const isValid = await bcrypt.compare(data.password, user.password)
+            const isValid = await bcrypt.compare(data.password, user.password)
 
-        if (!isValid) throw new HttpException(`Erreur : Identifiants incorrects`, HttpStatus.UNAUTHORIZED)
+            if (!isValid) throw new HttpException(`Erreur : Identifiants incorrects`, HttpStatus.UNAUTHORIZED)
 
-        const payload = { userId: user.id, role: user.role }
+            const payload = { userId: user.id, role: user.role }
 
-        delete user.password;
+            delete user.password;
 
-        const access_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '1d' })
+            const access_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '1d' })
 
-        const refresh_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '1d' });
+            const refresh_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '1d' });
 
-        await this.userService.update({ id: payload.userId }, { refreshToken: refresh_token });
+            await this.userService.update({ id: payload.userId }, { refreshToken: refresh_token });
 
-        return {
-            access_token,
-            refresh_token,
-            message: `Vous êtes bien connecté`,
+            return {
+                access_token,
+                refresh_token,
+                message: `Vous êtes bien connecté`,
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
