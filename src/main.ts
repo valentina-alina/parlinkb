@@ -22,6 +22,8 @@ async function bootstrap() {
   const ipv4Url = process.env.IPV4_URL;
   const vercelUrl = process.env.VERCEL_URL;
 
+  console.log('Allowed CORS Origins:', localhostUrl, ipv4Url, vercelUrl);
+
   app.enableCors({
     origin: [localhostUrl, ipv4Url, vercelUrl],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -54,4 +56,5 @@ async function bootstrap() {
   await app.listen(process.env.PORT || 3000);
   console.log(`L'application NestJS écoute sur le port 3000.`);
 }
+
 bootstrap();
