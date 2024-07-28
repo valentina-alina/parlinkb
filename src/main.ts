@@ -20,14 +20,13 @@ async function bootstrap() {
 
   const localhostUrl = process.env.LOCALHOST_URL;
   const ipv4Url = process.env.IPV4_URL;
-  const vercelUrl = process.env.VERCEL_URL;
-
-  console.log('vercelUrl', vercelUrl);
+  const vercelUrl = process.env.VERCEL_URL;;
 
   app.enableCors({
     origin: [localhostUrl, ipv4Url, vercelUrl],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization','refresh_token'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'Authorization','refresh_token'],
+    exposedHeaders: ['Authorization'],
     credentials: true,
   });
   console.log('CORS configuré');
