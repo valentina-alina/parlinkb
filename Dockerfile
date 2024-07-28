@@ -14,17 +14,11 @@ COPY package.json ./
 # Install the dependencies
 RUN npm install
 
-# Copy the Prisma schema and migrations separately if needed
-COPY prisma ./prisma
-
-# Verify the prisma/schema.prisma file exists
-RUN ls -la ./prisma && cat ./prisma/schema.prisma
-
 # Copy the app files to the container.
 COPY . .
 
 # Generate Prisma client
-RUN npx prisma generate --schema=prisma/schema.prisma
+RUN npx prisma generate
 
 # Build the application => TJ => JS
 RUN npm run build
