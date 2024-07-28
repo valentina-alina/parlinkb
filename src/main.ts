@@ -22,6 +22,8 @@ async function bootstrap() {
   const ipv4Url = process.env.IPV4_URL;
   const vercelUrl = process.env.VERCEL_URL;
 
+  console.log('vercelUrl', vercelUrl);
+
   app.enableCors({
     origin: [localhostUrl, ipv4Url, vercelUrl],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
