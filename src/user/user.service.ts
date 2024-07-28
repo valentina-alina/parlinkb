@@ -85,43 +85,42 @@ export class UserService {
   }
 
   async getUsersWithDetails(options: Prisma.UserFindManyArgs) {
-  const users = await this.prisma.user.findMany({
-    ...options,
-    orderBy: {
-      lastName: 'asc', 
-    },
-    select: {
-      firstName: true,
-      lastName: true,
-      email: true,
-      userHasSubjects: {
-        select: {
-          subjects: {
-            select: {
-              name: true,
+    const users = await this.prisma.user.findMany({
+      ...options,
+      orderBy: {
+        lastName: 'asc', 
+      },
+      select: {
+        firstName: true,
+        lastName: true,
+        email: true,
+        userHasSubjects: {
+          select: {
+            subjects: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        userHasChild: {
+          select: {
+            children: {
+              select: {
+                firstName: true,
+                lastName: true,
+                school: true,
+                class: true,
+              },
             },
           },
         },
       },
-      userHasChild: {
-        select: {
-          children: {
-            select: {
-              firstName: true,
-              lastName: true,
-              school: true,
-              class: true,
-            },
-          },
-        },
-      },
-    },
-  });
+    });
 
-  // Transform the result to match the desired output structure
-  return users
-}
-
+    // Transform the result to match the desired output structure
+    return users
+  }
 
   async update(
       where: Prisma.UserWhereUniqueInput,
@@ -160,5 +159,6 @@ export class UserService {
       return {
         message: `Unexpected error: ${error.message}`,
       };
-    }}
+    }
   }
+}

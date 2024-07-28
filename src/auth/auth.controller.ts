@@ -100,21 +100,21 @@ export class AuthController {
 
         const user = await this.userService.findByUnique({ email: data.email})
 
-        if (!user) throw new HttpException('Erreur: identifiants incorrects', HttpStatus.CONFLICT);
+        if (!user) throw new HttpException('Erreur: identifiants incorrects', HttpStatus.UNAUTHORIZED);
 
         const isValid = await bcrypt.compare(data.password, user.password)
 
-        if (!isValid) throw new HttpException(`Erreur : Identifiants incorrects`, HttpStatus.CONFLICT)
+        if (!isValid) throw new HttpException(`Erreur : Identifiants incorrects`, HttpStatus.UNAUTHORIZED)
 
         const payload = { userId: user.id, role: user.role }
 
         delete user.password;
 
-        const access_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '2m' })
+        const access_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '1d' })
 
         const refresh_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '1d' });
 
-        this.userService.update({ id: payload.userId }, { refreshToken: refresh_token });
+        await this.userService.update({ id: payload.userId }, { refreshToken: refresh_token });
 
         return {
             access_token,
