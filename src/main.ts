@@ -22,8 +22,6 @@ async function bootstrap() {
   const ipv4Url = process.env.IPV4_URL;
   const vercelUrl = process.env.VERCEL_URL;
 
-  console.log('Allowed CORS Origins:', localhostUrl, ipv4Url, vercelUrl);
-
   app.enableCors({
     origin: [localhostUrl, ipv4Url, vercelUrl],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
