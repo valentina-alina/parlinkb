@@ -18,7 +18,19 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   console.log('Application NestJS créée.');
 
-  app.enableCors();
+  const localhostUrl = process.env.LOCALHOST_URL;
+  const ipv4Url = process.env.IPV4_URL;
+  const vercelUrl = process.env.VERCEL_URL;
+
+  console.log('CORS Origins:', [localhostUrl, ipv4Url, vercelUrl]);
+
+  app.enableCors({
+    origin: [localhostUrl, ipv4Url, vercelUrl],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'Authorization','refresh_token'],
+    exposedHeaders: ['Authorization'],
+    credentials: true,
+  });
   console.log('CORS configuré');
 
   app.useGlobalPipes(new ValidationPipe());
@@ -45,4 +57,5 @@ async function bootstrap() {
   await app.listen(process.env.PORT || 3000);
   console.log(`L'application NestJS écoute sur le port 3000.`);
 }
+
 bootstrap();
