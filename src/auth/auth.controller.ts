@@ -108,7 +108,6 @@ export class AuthController {
             }
 
             const isValid = await bcrypt.compare(data.password, user.password)
-            console.log(`Password valid: ${isValid}`);
 
             if (!isValid) {
                 console.error(`Mot de passe invalide pour l'utilisateur: `, data.email);

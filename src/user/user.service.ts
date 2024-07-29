@@ -16,8 +16,7 @@ export class UserService {
   //   return bcrypt.hash(password, salt);
   // }
   async create(data: CreateUserDto): Promise<User> {
-    //console.log(data);
-    console.log(`Création de l'utilisateur avec les données: `, data);
+    console.log(data);
 
     const user = await this.prisma.user.create(
       {
