@@ -99,14 +99,21 @@ export class AuthController {
     ): Promise<{ access_token: string, refresh_token: string, message: string }> {
 
         try {
+            console.log(`Tentative de connexion avec l'email: ${data.email}`);
             const user = await this.userService.findByUnique({ email: data.email})
 
-            if (!user) throw new HttpException('Erreur: identifiants incorrects', HttpStatus.UNAUTHORIZED);
+            if (!user) {
+                console.error(`Utilisateur non trouvé avec l'email: `, data.email);
+                throw new HttpException('Erreur: identifiants incorrects', HttpStatus.UNAUTHORIZED)
+            }
 
             const isValid = await bcrypt.compare(data.password, user.password)
+            console.log(`Password valid: ${isValid}`);
 
-            if (!isValid) throw new HttpException(`Erreur : Identifiants incorrects`, HttpStatus.UNAUTHORIZED)
-
+            if (!isValid) {
+                console.error(`Mot de passe invalide pour l'utilisateur: `, data.email);
+                throw new HttpException(`Erreur : Identifiants incorrects`, HttpStatus.UNAUTHORIZED)
+            }
             const payload = { userId: user.id, role: user.role }
 
             delete user.password;
@@ -116,14 +123,14 @@ export class AuthController {
             const refresh_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '1d' });
 
             await this.userService.update({ id: payload.userId }, { refreshToken: refresh_token });
-
+            console.log(`Connexion réussie pour l'utilisateur: `, user.email);
             return {
                 access_token,
                 refresh_token,
                 message: `Vous êtes bien connecté`,
             }
         } catch (error) {
-            console.error('Login error:', error);
+            console.error(`Erreur de connexion:`, error);
             throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

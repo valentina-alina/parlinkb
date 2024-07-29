@@ -16,16 +16,21 @@ export class UserService {
   //   return bcrypt.hash(password, salt);
   // }
   async create(data: CreateUserDto): Promise<User> {
-    console.log(data);
+    //console.log(data);
+    console.log(`Création de l'utilisateur avec les données: `, data);
 
     const user = await this.prisma.user.create(
       {
         data: {
-          role: data.role, firstName: data.firstName, lastName: data.lastName, email: data.email, password: data.password
+          role: data.role,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          password: data.password
         }
       }
     );
-
+    console.log(`Utilisateur créé`, user);
     return user;
   }
 
