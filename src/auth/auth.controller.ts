@@ -99,30 +99,21 @@ export class AuthController {
     ): Promise<{ access_token: string, refresh_token: string, message: string }> {
 
         try {
-            console.log(`Tentative de connexion avec l'email: ${data.email}`);
-            const user = await this.userService.findByUnique({ email: data.email})
+            const user = await this.userService.findByUnique({ email: data.email});
 
-            if (!user) {
-                console.error(`Utilisateur non trouvé avec l'email: `, data.email);
-                throw new HttpException('Erreur: identifiants incorrects', HttpStatus.UNAUTHORIZED)
-            }
+            if (!user) throw new HttpException('Erreur: identifiants incorrects', HttpStatus.UNAUTHORIZED);
 
-            const isValid = await bcrypt.compare(data.password, user.password)
+            const isValid = await bcrypt.compare(data.password, user.password);
 
-            if (!isValid) {
-                console.error(`Mot de passe invalide pour l'utilisateur: `, data.email);
-                throw new HttpException(`Erreur : Identifiants incorrects`, HttpStatus.UNAUTHORIZED)
-            }
-            const payload = { userId: user.id, role: user.role }
+            if (!isValid) throw new HttpException(`Erreur : Identifiants incorrects`, HttpStatus.UNAUTHORIZED);
+            const payload = { userId: user.id, role: user.role };
 
             delete user.password;
 
-            const access_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '1d' })
-
+            const access_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET, expiresIn: '1d' });
             const refresh_token = await this.jwtService.signAsync(payload, { secret: process.env.JWT_REFRESH_TOKEN, expiresIn: '1d' });
 
             await this.userService.update({ id: payload.userId }, { refreshToken: refresh_token });
-            console.log(`Connexion réussie pour l'utilisateur: `, user.email);
             return {
                 access_token,
                 refresh_token,
