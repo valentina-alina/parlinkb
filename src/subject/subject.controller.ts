@@ -44,7 +44,7 @@ export class SubjectController {
     const out = await this.service.findAllByParams(prismaOptions);
     return {
       [this.dataName]: out,
-      message: `All subjects`,
+      message: `Toutes les matières`,
     };
   }
 
@@ -60,11 +60,11 @@ export class SubjectController {
   async readRoute(@Param('id') id: string): Promise<{ [key: string]: Subject | string }> {
     const out = await this.service.findByUnique({ id });
 
-    if (!out) throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.CONFLICT);
+    if (!out) throw new HttpException(`Le sujet n'a pas été trouvé`, HttpStatus.CONFLICT);
     
     return {
       [this.dataName]: out,
-      message: `Subject avec l'id ${id}`,
+      message: `Matière avec l'id ${id}`,
     };
   }
 
@@ -73,7 +73,7 @@ export class SubjectController {
     const out = await this.service.update({ id }, inputDto);
     return {
       [this.dataName]: out,
-      message: `Subject avec l'id ${id} a été mis à jour`,
+      message: `La matière avec l'id ${id} a été mise à jour`,
     };
   }
 
@@ -82,7 +82,7 @@ export class SubjectController {
     const subject = await this.service.findByUnique({ id });
 
     if (!subject) {
-      throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+      throw new HttpException(`Le sujet n'a pas été trouvé`, HttpStatus.NOT_FOUND);
     }
 
     const result = await this.service.delete({ id });
@@ -94,7 +94,7 @@ export class SubjectController {
 
     return {
       subject: result,
-      message: `Subject avec l'id ${id} a été supprimé`,
+      message: `La matière avec l'id ${id} a été supprimée`,
     };
   }
 }

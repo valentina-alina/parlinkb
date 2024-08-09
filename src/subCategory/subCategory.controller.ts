@@ -34,7 +34,7 @@ export class SubCategoryController {
   async findAll(): Promise<{ subCategories: string[], message: string }> {
     const subCategories = await this.subCategoryService.findAllSubCategoryNames();
 
-    if (!subCategories) throw new HttpException('La liste des sous-catégories n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if (!subCategories) throw new HttpException(`La liste des sous-catégories n'a pas été trouvée`, HttpStatus.CONFLICT)
 
     return {
       subCategories,
@@ -48,7 +48,7 @@ export class SubCategoryController {
   ): Promise<{subCategory: SubCategory, message: string}> {
     const subCategory = await this.subCategoryService.findByUnique({ id });
 
-    if (!subCategory) throw new HttpException('La sous-catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if (!subCategory) throw new HttpException(`La sous-catégorie n'a pas été trouvée`, HttpStatus.CONFLICT)
 
     return {
       subCategory,
@@ -62,7 +62,7 @@ export class SubCategoryController {
   ): Promise<{subCategory: SubCategory, message: string}> {
     const subCategory = await this.subCategoryService.findByFirstName(name);
 
-    if (!subCategory) throw new HttpException('La subcatégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if (!subCategory) throw new HttpException(`La subcatégorie n'a pas été trouvée`, HttpStatus.CONFLICT)
 
     return {
       subCategory,
@@ -94,7 +94,7 @@ export class SubCategoryController {
   ): Promise<{subCategory: SubCategory, message: string}> {
     const subCategory = await this.subCategoryService.findByUnique({ id });
       
-    if (!subCategory) throw new HttpException('La sous-catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if (!subCategory) throw new HttpException(`La sous-catégorie n'a pas été trouvée`, HttpStatus.CONFLICT)
 
     const subCategoryUpdate = await this.subCategoryService.update({ id },updateSubCategoryDto);
 
@@ -108,7 +108,7 @@ export class SubCategoryController {
   async remove(@Param('id') id: string): Promise<SubCategory | { message: string}> {
     const subCategory = await this.subCategoryService.findByUnique({ id })
 
-    if(!subCategory) throw new HttpException('La sous-catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if(!subCategory) throw new HttpException(`La sous-catégorie n'a pas été trouvée`, HttpStatus.CONFLICT)
 
     this.subCategoryService.delete({ id });
 

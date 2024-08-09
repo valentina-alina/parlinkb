@@ -14,7 +14,7 @@ export class FileController {
   @Post()
   async create(@Body() inputDto: CreateFileDto): Promise<{ [key: string]: File | string }> {
     const out = await this.service.create(inputDto);
-    const message = 'New file was created';
+    const message = 'Nouveau fichier créé';
     return {
       [this.dataName]: out,
       message,
@@ -29,7 +29,7 @@ export class FileController {
     if (query.take) prismaOptions.take = +query.take;
 
     const out = await this.service.findAllByParams(prismaOptions);
-    const message = `All files`;
+    const message = `Tous les fichiers`;
     return {
       [this.dataName]: out,
       message
@@ -40,9 +40,9 @@ export class FileController {
   async readRoute(@Param('id') id: string): Promise<{ [key: string]: File | string }> {
     const out = await this.service.findByUnique({ id });
 
-    if (!out) throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.CONFLICT);
+    if (!out) throw new HttpException(`Le sujet n'a pas été trouvé`, HttpStatus.CONFLICT);
     
-    const message = `File avec l'id ${id}`;
+    const message = `Fichier avec l'id ${id}`;
     return {
       [this.dataName]: out,
       message
@@ -52,7 +52,7 @@ export class FileController {
   @Patch(':id')
   async update(@Param('id') id: string, @Body() inputDto: UpdateFileDto): Promise<{ [key: string]: File | string }> {
     const out = await this.service.update({ id }, inputDto);
-    const message = `File avec l'id ${id} a été mis à jour`;
+    const message = `Le fichier avec l'id ${id} a été mis à jour`;
     return {
       [this.dataName]: out,
       message
@@ -63,7 +63,7 @@ export class FileController {
   // async remove(@Param('id') id: string): Promise<File | string> {
   //   const file = await this.service.findByUnique({ id });
 
-  //   if (!file) throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.CONFLICT);
+  //   if (!file) throw new HttpException(`Le sujet n'a pas été trouvé`, HttpStatus.CONFLICT);
 
   //   const out = await this.service.delete({ id });
 
@@ -77,7 +77,7 @@ export class FileController {
     const file = await this.service.findByUnique({ id });
 
     if (!file) {
-      throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+      throw new HttpException(`Le sujet n'a pas été trouvé`, HttpStatus.NOT_FOUND);
     }
 
     const result = await this.service.delete({ id });
@@ -87,7 +87,7 @@ export class FileController {
       throw new HttpException(result, HttpStatus.CONFLICT);
     }
 
-    const message = `File avec l'id ${id} a été supprimé`;
+    const message = `Le fichier avec l'id ${id} a été supprimé`;
     return { file: result, message };
   }
 }

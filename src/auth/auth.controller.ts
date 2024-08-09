@@ -51,7 +51,7 @@ export class AuthController {
 
         const user = await this.userService.findByUnique({ email: data.email })
 
-        if (user) throw new CustomException('L\'utilisateur existe déjà', HttpStatus.CONFLICT, "UC-create-1")
+        if (user) throw new CustomException(`L'utilisateur existe déjà`, HttpStatus.CONFLICT, "UC-create-1")
 
         const passwordIni = await this.authService.hash(this.authService.generateRandomPassword(10));
         const a={ ...data, password: passwordIni, role: role};
@@ -75,7 +75,7 @@ export class AuthController {
         console.log(user)
 
         if (!user) {
-            throw new HttpException(`L\'utilisateur  n\'a pas été trouvé ${data.email}`, HttpStatus.NOT_FOUND);
+            throw new HttpException(`L'utilisateur  n'a pas été trouvé ${data.email}`, HttpStatus.NOT_FOUND);
         }
         // le code d'acces est envoyé par mail. il represente le pasword generé et hache pour la premiere fois
         if (data.code===user.password) {
@@ -134,7 +134,7 @@ export class AuthController {
         const user = await this.userService.findByUnique({ id });
 
         if (!user) {
-            throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+            throw new HttpException(`L'utilisateur n'a pas été trouvé`, HttpStatus.NOT_FOUND);
         }
         if (data.password) {
             data.password = await this.authService.hash(data.password);

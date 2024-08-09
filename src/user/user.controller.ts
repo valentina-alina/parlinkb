@@ -65,13 +65,13 @@ export class UserController {
 
       const user = await this.userService.findByUnique({ email: mail })
 
-      if (user) throw new CustomException('L\'utilisateur existe déjà', HttpStatus.CONFLICT, "UC-create-1")
+      if (user) throw new CustomException(`L'utilisateur existe déjà`, HttpStatus.CONFLICT, "UC-create-1")
 
       const passwordIni = await this.authService.hash(this.authService.generateRandomPassword(10));
 
       const new_user = await this.userService.create({ ...data.user, password: passwordIni });
 
-      messages = [...messages, `🚀 New user ${new_user.firstName} ${new_user.lastName} was created`];
+      messages = [...messages, `🚀 Le nouvel utilisateur ${new_user.firstName} ${new_user.lastName} a été créé`];
 
           
       if (data.subjects) {
@@ -80,8 +80,8 @@ export class UserController {
               const subject = await this.subjectService.findByUnique({ name: sub });
               if (subject) {
                   const new_user_has_subject = await this.userHasSubjectService.create({ userId: new_user.id, subjectId: subject["id"] });
-                  messages = [...messages, `🚀 Le sujet ${sub} a été associé à ${new_user.firstName} ${new_user.lastName}`];
-                  console.log('🚀 User has subject : ', new_user_has_subject);
+                  messages = [...messages, `🚀 La matière ${sub} a été associée à ${new_user.firstName} ${new_user.lastName}`];
+                  console.log(`🚀 Utilisateur a la matière : `, new_user_has_subject);
               } else {
                   messages = [...messages, `🚀 Le sujet ${sub} n'existe pas`];
                   console.log(`🚀 Le sujet "${sub}" n'existe pas`);
@@ -95,13 +95,13 @@ export class UserController {
               let child = out[0];
               if (!child) {
                 const childOut = await this.childService.create(element);
-                  messages = [...messages, `🚀 Child created: ${childOut.child.firstName} ${childOut.child.lastName}`];
-                  console.log("🚀 child:created", childOut);
+                  messages = [...messages, `🚀 Enfant créé: ${childOut.child.firstName} ${childOut.child.lastName}`];
+                  console.log(`🚀 Enfant:créé`, childOut);
                   child=childOut.child;
               }
               const new_user_has_child = await this.uhcService.create({ userId: new_user.id, childId: child.id });
-              messages = [...messages, `🚀 ${new_user.firstName} ${new_user.lastName} has child: ${child.firstName} ${child.lastName}`];
-              console.log("🚀 user has child:created", new_user_has_child);
+              messages = [...messages, `🚀 ${new_user.firstName} ${new_user.lastName} a l'enfant: ${child.firstName} ${child.lastName}`];
+              console.log(`🚀 Utilisateur a l'enfant:créé`, new_user_has_child);
           }));
       }
         return {
@@ -115,7 +115,7 @@ export class UserController {
     console.log(token)
 
       if (!token) {
-            throw new UnauthorizedException('Access denied: Token not found');
+            throw new UnauthorizedException(`Accès refusé: Token non trouvé`);
         }
 
         let tokenDecode: jwtPayloadDto;
@@ -123,7 +123,7 @@ export class UserController {
         try {
             tokenDecode = jwtDecode<jwtPayloadDto>(token);
         } catch (error) {
-            throw new UnauthorizedException('Invalid token');
+            throw new UnauthorizedException(`Token invalide`);
         }
       const userId = tokenDecode.userId;
       const user = await this.userService.findByUnique({ id: userId })
@@ -151,7 +151,7 @@ export class UserController {
 
     return {
           users,
-          message: `All users with details`,
+          message: `Tous les utilisateurs avec les détails`,
         };
   }
 
@@ -167,7 +167,7 @@ export class UserController {
       lastName: user.lastName,
     };
 
-    if (!user) throw new HttpException('L\'utilisateur n\'a pas été trouvé', HttpStatus.CONFLICT)
+    if (!user) throw new HttpException(`L'utilisateur n'a pas été trouvé`, HttpStatus.CONFLICT)
 
     return {data,
       message: `Utilisateur avec l'id ${id}`,

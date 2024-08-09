@@ -14,7 +14,8 @@ export class ChildController {
   @Post()
   async create(@Body() inputDto: CreateChildDto): Promise<{child?:Child , message:string}> {
     const out = await this.service.create(inputDto);
-    const message = 'New child was created';
+    const message = `Un nouvel enfant a été créé`;
+    console.log(`message`, message)
     return out;
   }
 
@@ -26,7 +27,7 @@ export class ChildController {
     if (query.take) prismaOptions.take = +query.take;
 
     const out = await this.service.findAllByParams(prismaOptions);
-    const message = `All childs`;
+    const message = `Tous les enfants`;
     return {
       [this.dataName]: out,
       message
@@ -37,7 +38,7 @@ export class ChildController {
 
   console.log("🚀 ~ ChildController ~ findAllByfilter ~ element:", element)
     const out = await this.service.findAllByFilters(element);
-    const message = `All childs`;
+    const message = `Tous les enfants`;
     return {
       [this.dataName]: out,
       message
@@ -49,9 +50,9 @@ export class ChildController {
   async readRoute(@Param('id') id: string): Promise<{ [key: string]: Child | string }> {
     const out = await this.service.findByUnique({ id });
 
-    if (!out) throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.CONFLICT);
+    if (!out) throw new HttpException(`Le sujet n'a pas été trouvé`, HttpStatus.CONFLICT);
     
-    const message = `Child avec l'id ${id}`;
+    const message = `Enfant avec l'id ${id}`;
     return {
       [this.dataName]: out,
       message
@@ -61,7 +62,7 @@ export class ChildController {
   @Patch(':id')
   async update(@Param('id') id: string, @Body() inputDto: UpdateChildDto): Promise<{ [key: string]: Child | string }> {
     const out = await this.service.update({ id }, inputDto);
-    const message = `Child avec l'id ${id} a été mis à jour`;
+    const message = `L'enfant avec l'id ${id} a été mis à jour`;
     return {
       [this.dataName]: out,
       message
@@ -72,7 +73,7 @@ export class ChildController {
   // async remove(@Param('id') id: string): Promise<Child | string> {
   //   const child = await this.service.findByUnique({ id });
 
-  //   if (!child) throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.CONFLICT);
+  //   if (!child) throw new HttpException(`Le sujet n'a pas été trouvé`, HttpStatus.CONFLICT);
 
   //   const out = await this.service.delete({ id });
 
@@ -86,7 +87,7 @@ export class ChildController {
     const child = await this.service.findByUnique({ id });
 
     if (!child) {
-      throw new HttpException('Le sujet n\'a pas été trouvé', HttpStatus.NOT_FOUND);
+      throw new HttpException(`Le sujet n'a pas été trouvé`, HttpStatus.NOT_FOUND);
     }
 
     const result = await this.service.delete({ id });

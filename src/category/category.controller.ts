@@ -40,7 +40,7 @@ export class CategoryController {
   async findAll(): Promise<{ categories: string[], message: string }> {
     const categories = await this.categoryService.findAllCategoryNames();
 
-    if (!categories) throw new HttpException('La liste de catégories n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if (!categories) throw new HttpException(`La liste de catégories n'a pas été trouvée`, HttpStatus.CONFLICT)
 
     return {
       categories,
@@ -54,7 +54,7 @@ export class CategoryController {
   ): Promise<{category: Category, message: string}> {
     const category = await this.categoryService.findByFirstName(name);
 
-    if (!category) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if (!category) throw new HttpException(`La catégorie n'a pas été trouvée`, HttpStatus.CONFLICT)
 
     return {
       category,
@@ -68,7 +68,7 @@ export class CategoryController {
   ): Promise<{category: Category, message: string}> {
     const category = await this.categoryService.findByUnique({ id });
 
-    if (!category) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if (!category) throw new HttpException(`La catégorie n'a pas été trouvée`, HttpStatus.CONFLICT)
 
     return {
       category,
@@ -83,7 +83,7 @@ export class CategoryController {
   ): Promise<{category: Category, message: string}> {
     const category = await this.categoryService.findByUnique({ id });
       
-    if (!category) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if (!category) throw new HttpException(`La catégorie n'a pas été trouvée`, HttpStatus.CONFLICT)
 
     const categoryUpdate = await this.categoryService.update({ id },updateCategoryDto);
 
@@ -97,7 +97,7 @@ export class CategoryController {
   async remove(@Param('id') id: string): Promise<Category | { message: string}> {
     const category = await this.categoryService.findByUnique({ id })
 
-    if(!category) throw new HttpException('La catégorie n\'a pas été trouvée', HttpStatus.CONFLICT)
+    if(!category) throw new HttpException(`La catégorie n'a pas été trouvée`, HttpStatus.CONFLICT)
 
     this.categoryService.delete({ id });
 
