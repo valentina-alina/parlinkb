@@ -3,9 +3,13 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nes
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
+export interface Response<T> {
+    data: T;
+}
+
 @Injectable()
-export class LoggingInterceptor implements NestInterceptor {
-    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+export class LoggingInterceptor<T> implements NestInterceptor<T, Response<T>> {
+    intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
         console.log('Avant...');
 
         const now = Date.now();

@@ -7,11 +7,11 @@ import { Cache } from 'cache-manager';
 export class CacheService {
     constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
-    async get(key: string): Promise<any> {
+    async get(key: string): Promise<string> {
         return this.cacheManager.get(key);
     }
 
-    async set(key: string, value: any, ttl: number): Promise<void> {
+    async set(key: string, value: string | number, ttl: number): Promise<void> {
         await this.cacheManager.set(key, value, ttl);
     }
 

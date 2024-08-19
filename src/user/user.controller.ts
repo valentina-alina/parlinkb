@@ -55,7 +55,6 @@ export class UserController {
     private userHasSubjectService: UserHasSubjectService,
   ) {}
 
-
   @UseGuards(AdminGuard)
   @Post('register')
   async signup(
