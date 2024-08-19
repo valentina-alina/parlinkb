@@ -20,8 +20,8 @@ export interface AdCreateInputInterface  {
     adPicture?: string | null
     createdAt?: Date | string | null
     updatedAt?: Date | string | null
-    adHasFile?: string | null
-    userHasAd?: string | null
+    adHasFile?: any
+    userHasAd?: any
 }
 
 export interface AdCreateForeignKeyInterface {
