@@ -29,12 +29,7 @@ export class AdService {
   }
 
   async findAllByParams(options: Prisma.AdFindManyArgs): Promise<Ad[]>{
-    return this.prisma.ad.findMany({
-      ...options,
-      orderBy: {
-        createdAt: 'desc',
-      }
-    });
+    return this.prisma.ad.findMany(options);
   }
 
   async findAllByFilters(query: string): Promise<Ad[]>{
