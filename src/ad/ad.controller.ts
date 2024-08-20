@@ -76,15 +76,14 @@ export class AdController {
   async readRoute(
       @Param('id') id: string,
   ): ResponseAdPromiseInterface {
-  try {
-    return {
-      ad: await this.adService.findByUnique({ id }),
-      message: responseCode(id).success.event.byId
-    };
-  } catch (error) {
-   throw new HttpException(responseCode(id).error.event.byId, HttpStatus.NOT_FOUND)  
-  }
-   
+    try {
+      return {
+        ad: await this.adService.findByUnique({ id }),
+        message: responseCode(id).success.event.byId
+      };
+    } catch (error) {
+    throw new HttpException(responseCode(id).error.event.byId, HttpStatus.NOT_FOUND)  
+    }
   }
 
 
@@ -116,7 +115,6 @@ export class AdController {
     } catch (error) {
       throw new HttpException(responseCode(id).error.event.update, HttpStatus.NOT_FOUND)  
     }
-     
   }
 
   @Delete(':id')
@@ -128,7 +126,6 @@ export class AdController {
       message: responseCode(id).success.event.delete
     }
   }
-
 
 /**
  * ************************

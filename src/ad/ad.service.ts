@@ -29,7 +29,12 @@ export class AdService {
   }
 
   async findAllByParams(options: Prisma.AdFindManyArgs): Promise<Ad[]>{
-    return this.prisma.ad.findMany(options); // SELECT???
+    return this.prisma.ad.findMany({
+      ...options,
+      orderBy: {
+        startTime: 'desc'
+      }
+    });
   }
 
   async findAllByFilters(query: string): Promise<Ad[]>{
@@ -88,7 +93,7 @@ export class AdService {
     });
   }
 
-   async exist(
+  async exist(
     adWhereUniqueInput: Prisma.AdWhereUniqueInput
   ): Promise<boolean> {
     return !!await this.prisma.ad.count({
