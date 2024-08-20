@@ -32,7 +32,7 @@ export class AdService {
     return this.prisma.ad.findMany({
       ...options,
       orderBy: {
-        startTime: 'desc'
+        createdAt: 'desc',
       }
     });
   }
