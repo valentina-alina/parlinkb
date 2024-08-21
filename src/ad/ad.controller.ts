@@ -4,14 +4,14 @@ import { AdService } from './ad.service';
 import { Ad, Prisma, UserHasAds } from '@prisma/client';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
-import { UserService } from '../../src/user/user.service';
+import { UserService } from '../user/user.service';
 import { AuthGuard } from '../guards/jwt.guards';
 import { GetAdsFilterDto } from './dto/get-ads-filter.dto';
 import { GetAdsCategoryDto } from './dto/get-ads-category.dto';
 import { GetAdsUserDto } from './dto/get-ads-user.dto';
-import { PaginatorQueryInterface } from 'src/interfaces/paginator';
+import { PaginatorQueryInterface } from '../interfaces/paginator';
 import { ResponseAdPromiseInterface, ResponseAdsPromiseInterface } from './interface/response.interface';
-import { responseCode } from 'src/utils/response.utils';
+import { responseCode } from '../utils/response.utils';
 
 
 //? ROUTE FILTRE BARRE DE RECHERCHE PAR TITRE | VILLE
