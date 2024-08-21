@@ -119,6 +119,15 @@ export class UserService {
             },
           },
         },
+        Profile : {
+          select :{
+            profilePicture :true,
+            city : true,
+            postalCode : true,
+            address : true,
+            phone : true,
+          }
+        },
       },
     });
 
