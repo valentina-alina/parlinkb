@@ -98,7 +98,7 @@ export class UserService {
         firstName: true,
         lastName: true,
         email: true,
-        role: true,
+        role : true,
         userHasSubjects: {
           select: {
             subjects: {
@@ -127,14 +127,13 @@ export class UserService {
             postalCode : true,
             address : true,
             phone : true,
-          }
+            }
         },
       },
-    });
-
-    // Transform the result to match the desired output structure
+    })
     return users
   }
+  
 
   async update(
       where: Prisma.UserWhereUniqueInput,

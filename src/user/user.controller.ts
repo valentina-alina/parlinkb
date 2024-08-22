@@ -16,12 +16,9 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { GetToken } from '../guards/getToken.decorator' 
 import { jwtDecode } from 'jwt-decode';
-// import * as bcrypt from 'bcrypt';
-// import { randomBytes } from 'crypto';
-// import { Child} from "@prisma/client";
 import { CustomException } from "../../src/exceptions/custom.exception";
 import { RegisterUserDto } from "../user/dto/register-user.dto";
-
+import { Request as ExpressRequest } from 'express';
 import { SubjectService } from "../subject/subject.service";
 import { ChildService } from "../child/child.service";
 
@@ -31,10 +28,13 @@ import { UserHasSubjectService } from "../userHasSubject/userHasSubject.service"
 import { AuthGuard } from '../guards/jwt.guards';
 import { AdminGuard } from "../guards/admin.jwt.guards";
 
-// import { UpdateUserDto } from './dto/update-user.dto';
 import { Prisma, User } from '@prisma/client';
 import { jwtPayloadDto } from "../guards/jwtPayload.dto"
-import { AuthRefreshGuard } from "../guards/refresh.jwt.guards";
+
+interface Request extends ExpressRequest {
+  user?: { sub: number, email: string };
+  refresh_token: string;
+}
 
 interface getByIdResponse{
   firstName: string;
@@ -42,7 +42,6 @@ interface getByIdResponse{
 } 
 
 @UseGuards(AuthGuard)
-@UseGuards(AuthRefreshGuard)
 @Controller('user')
 export class UserController {
   constructor(
@@ -58,8 +57,8 @@ export class UserController {
   @UseGuards(AdminGuard)
   @Post('register')
   async signup(
-      @Body() data: RegisterUserDto): Promise<{ user: User, messages: string [] }> {
-          let messages: string[] = [];
+    @Body() data: RegisterUserDto): Promise<{ user: User, messages: string [] }> {
+      let messages: string[] = [];
       const mail = data.user.email
 
       const user = await this.userService.findByUnique({ email: mail })
@@ -107,6 +106,11 @@ export class UserController {
           user: new_user,
           messages
       }
+    }
+
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
   }
 
   @Post('signout')
@@ -146,12 +150,10 @@ export class UserController {
     if (query.skip) prismaOptions.skip = +query.skip;
     if (query.take) prismaOptions.take = +query.take;
 
-    const users = await this.userService.getUsersWithDetails(prismaOptions);
-
     return {
-          users,
-          message: `Tous les utilisateurs avec les détails`,
-        };
+      users: await this.userService.getUsersWithDetails(prismaOptions),
+      message: `Tous les utilisateurs avec les détails`,
+    };
   }
 
   @Get(':id')
