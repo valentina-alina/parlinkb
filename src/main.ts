@@ -20,10 +20,10 @@ async function bootstrap() {
 
   const localhostUrl = process.env.LOCALHOST_URL;
   const ipv4Url = process.env.IPV4_URL;
-  const vercelUrl = process.env.VERCEL_URL;
+  // const vercelUrl = process.env.VERCEL_URL;
 
   app.enableCors({
-    origin: [localhostUrl, ipv4Url, vercelUrl],
+    origin: [localhostUrl,'http://localhost:3215'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'Authorization','refresh_token'],
     exposedHeaders: ['Authorization'],
@@ -52,9 +52,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   console.log('Documentation Swagger documentation configurée.');
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT || 3215);
   console.log(`L'application NestJS écoute sur le port :  ${process.env.PORT} .`);
-  console.log(`Front origins :  ${[localhostUrl, ipv4Url, vercelUrl]} .`);
+  console.log(`Front origins :  ${localhostUrl} .`);
 }
 
 bootstrap();
