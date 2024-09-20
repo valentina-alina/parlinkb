@@ -1,35 +1,36 @@
 services:
   front-prod:
-    image: registry.alt-tools.tech/aquildev/projet-ecole/front:devops
+    image: registry.alt-tools.tech/aquildev/projet-ecole/front:frontDevopsVR
     ports:
-      - 4578:80
+      - 3214:80
     networks:
       - internet
       
   nestjs:
-    image: registry.alt-tools.tech/aquildev/projet-ecole/back:devops
+    # image: registry.alt-tools.tech/aquildev/projet-ecole/back:backDevopsVR
+    image: mon-nestjs-backend # Utiliser l'image locale
     container_name: nestjs
     environment:
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_TOKEN: ${JWT_REFRESH_TOKEN}
-      REDIS_URL: ${REDIS_URL}
+      REDIS_URL: redis://redis:6379
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: 6379
       LOCALHOST_URL: ${LOCALHOST_URL}
       IPV4_URL: ${IPV4_URL}
     ports:
-      - "3000:3000"
+      - "3215:3000"
     depends_on:
-      - mariadb
+      - database
       - redis
     networks:
       - redis_network
       - db_network
       - internet
 
-  mariadb:
+  database:
     image: mariadb:11.2
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -37,7 +38,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
-      - ./mariadb_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
     networks:
       - db_network
 
@@ -51,9 +52,9 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
-      - "8080:80"
+      - "3216:80"
     depends_on:
-      - mariadb
+      - database
     networks:
       - db_network
       - internet
@@ -67,6 +68,8 @@ services:
 
 volumes:
   redis_data:
+  db_data:
+
 
 networks:
   redis_network: 
