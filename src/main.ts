@@ -23,7 +23,7 @@ async function bootstrap() {
   // const vercelUrl = process.env.VERCEL_URL;
 
   app.enableCors({
-    origin: [localhostUrl],
+    origin: [localhostUrl,ipv4Url],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'Authorization','refresh_token'],
     exposedHeaders: ['Authorization'],
