@@ -1,14 +1,13 @@
 services:
   front-prod:
-    image: registry.alt-tools.tech/aquildev/projet-ecole/front:frontDevopsVR
+    image: ghcr.io/valentina-alina/parlinkfront:parlinkionos
     ports:
       - 3214:80
     networks:
       - internet
       
   nestjs:
-    # image: registry.alt-tools.tech/aquildev/projet-ecole/back:backDevopsVR
-    image: mon-nestjs-backend # Utiliser l'image locale
+    image: ghcr.io/valentina-alina/parlinkback:parlinkionosapi
     container_name: nestjs
     environment:
       PORT: 3000
