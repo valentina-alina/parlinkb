@@ -1,8 +1,9 @@
-# Ce workflow se déclenche lors des commits sur la branche "prodionos"
+# Ce workflow se déclenche lors des commits sur la branche "parlinkionosapi"
 on:
   push:
     branches:
       - parlinkionosapi
+
 jobs:
   build-test:
     runs-on: ubuntu-latest
@@ -24,8 +25,7 @@ jobs:
 
       # Étape 3: Construire l'image Docker 
       - name: Build Docker image
-        run: docker build --build -t ghcr.io/${{ github.repository }}:${{ github.ref_name }} .
-
+        run: docker build -t ghcr.io/${{ github.repository }}:${{ github.ref_name }} .
 
       # Étape 4: Pousser l'image Docker sur GitHub Packages
       - name: Push Docker image to GitHub Packages
